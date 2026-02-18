@@ -29,6 +29,12 @@ SOFTWARE.
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
   <title>Session Details - Biathlon Shot Logger</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="assets/images/app-icon.png">
+  <meta name="theme-color" content="#0f172a">
+
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"
     rel="stylesheet" />
@@ -67,7 +73,7 @@ SOFTWARE.
   <div id="app-container"
     class="w-full max-w-[430px] h-[932px] bg-deep-charcoal relative overflow-hidden flex flex-col shadow-2xl md:rounded-[55px] md:border-8 md:border-zinc-800">
 
-    <header class="px-6 pt-16 pb-6">
+    <header class="px-6 pt-8 pb-6">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-4">
           <a href="index.html" class="p-2 -ml-2 text-off-white/70 active:scale-90 transition-all">

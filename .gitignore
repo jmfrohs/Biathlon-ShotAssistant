@@ -39,3 +39,6 @@ logs/
 tmp/
 temp/
 *.tmp
+
+# Test outputs
+test-outputs/

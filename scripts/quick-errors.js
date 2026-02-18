@@ -31,9 +31,12 @@ SOFTWARE.
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
-console.log('\n' + '='.repeat(85));
-console.log('                    🔍 QUICK ERROR REPORT - All Errors with Locations');
-console.log('='.repeat(85) + '\n');
+const TestLogger = require('./test-logger');
+const logger = new TestLogger('quick-errors');
+
+logger.log('\n' + '='.repeat(85));
+logger.log('                    🔍 QUICK ERROR REPORT - All Errors with Locations');
+logger.log('='.repeat(85) + '\n');
 try {
   let output = '';
   try {
@@ -43,7 +46,7 @@ try {
       stdio: ['pipe', 'pipe', 'pipe'],
     }).toString();
   } catch (e) {
-    console.log('📝 Jest not available, running code analysis instead...\n');
+    logger.log('📝 Jest not available, running code analysis instead...\n');
     execSync('node scripts/code-analysis.js', {
       cwd: process.cwd(),
       stdio: 'inherit',
@@ -83,16 +86,16 @@ try {
   const failMatch = output.match(/(\d+) failed/);
   const passed = passMatch ? parseInt(passMatch[1]) : 0;
   const failed = failMatch ? parseInt(failMatch[1]) : 0;
-  console.log('📊 TEST EXECUTION SUMMARY\n');
-  console.log(`  ✅ Passed:        ${passed}`);
-  console.log(`  ❌ Failed:        ${failed}`);
-  console.log(`  Total:           ${passed + failed}\n`);
+  logger.log('📊 TEST EXECUTION SUMMARY\n');
+  logger.log(`  ✅ Passed:        ${passed}`);
+  logger.log(`  ❌ Failed:        ${failed}`);
+  logger.log(`  Total:           ${passed + failed}\n`);
   if (failed === 0) {
-    console.log('✅ NO ERRORS - All tests are passing!\n');
-    console.log('='.repeat(85) + '\n');
+    logger.log('✅ NO ERRORS - All tests are passing!\n');
+    logger.log('='.repeat(85) + '\n');
     process.exit(0);
   }
-  console.log('='.repeat(85) + '\n');
+  logger.log('='.repeat(85) + '\n');
   const errorsByFile = {};
   errors.forEach((err) => {
     if (!errorsByFile[err.file]) {
@@ -102,23 +105,23 @@ try {
   });
   let fileNum = 1;
   Object.entries(errorsByFile).forEach(([file, fileErrors]) => {
-    console.log(`${fileNum}. 📄 File: ${file}`);
-    console.log(`   Errors in this file: ${fileErrors.length}\n`);
+    logger.log(`${fileNum}. 📄 File: ${file}`);
+    logger.log(`   Errors in this file: ${fileErrors.length}\n`);
     let errorNum = 1;
     fileErrors.forEach((err) => {
-      console.log(`   ${errorNum}. Test: ${err.test}`);
-      console.log(`      ${err.error}\n`);
+      logger.log(`   ${errorNum}. Test: ${err.test}`);
+      logger.log(`      ${err.error}\n`);
       errorNum++;
     });
     fileNum++;
   });
-  console.log('='.repeat(85) + '\n');
-  console.log('📋 DETAILED TEST OUTPUT:\n');
-  console.log(output);
-  console.log('\n' + '='.repeat(85) + '\n');
+  logger.log('='.repeat(85) + '\n');
+  logger.log('📋 DETAILED TEST OUTPUT:\n');
+  logger.log(output);
+  logger.log('\n' + '='.repeat(85) + '\n');
 } catch (error) {
   const output = error.stdout ? error.stdout.toString() : error.message;
-  console.log(output);
+  logger.log(output);
   const errorLines = output
     .split('\n')
     .filter(
@@ -130,11 +133,11 @@ try {
         line.includes('FAIL')
     );
   if (errorLines.length > 0) {
-    console.log('\n' + '='.repeat(85) + '\n');
-    console.log('🔴 ERRORS FOUND:\n');
+    logger.log('\n' + '='.repeat(85) + '\n');
+    logger.log('🔴 ERRORS FOUND:\n');
     errorLines.forEach((line, index) => {
-      console.log(`${index + 1}. ${line.trim()}`);
+      logger.log(`${index + 1}. ${line.trim()}`);
     });
-    console.log('\n' + '='.repeat(85) + '\n');
+    logger.log('\n' + '='.repeat(85) + '\n');
   }
 }

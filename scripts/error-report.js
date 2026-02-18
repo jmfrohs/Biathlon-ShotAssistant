@@ -31,9 +31,12 @@ SOFTWARE.
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-console.log('\n' + '='.repeat(80));
-console.log('          TEST ERROR REPORT - Errors with File Paths and Line Numbers');
-console.log('='.repeat(80) + '\n');
+const TestLogger = require('./test-logger');
+const logger = new TestLogger('error-report');
+
+logger.log('\n' + '='.repeat(80));
+logger.log('          TEST ERROR REPORT - Errors with File Paths and Line Numbers');
+logger.log('='.repeat(80) + '\n');
 try {
   let jestAvailable = false;
   try {
@@ -52,12 +55,12 @@ try {
   }
 
   if (!jestAvailable) {
-    console.log('📊 ERROR SUMMARY\n');
-    console.log('  Total Test Failures:     0');
-    console.log('  Total Error Messages:    0');
-    console.log('  Files with Errors:       0\n');
-    console.log('✅ NO ERRORS FOUND - All tests are passing!\n');
-    console.log('='.repeat(80) + '\n');
+    logger.log('📊 ERROR SUMMARY\n');
+    logger.log('  Total Test Failures:     0');
+    logger.log('  Total Error Messages:    0');
+    logger.log('  Files with Errors:       0\n');
+    logger.log('✅ NO ERRORS FOUND - All tests are passing!\n');
+    logger.log('='.repeat(80) + '\n');
     process.exit(0);
   }
 
@@ -94,24 +97,24 @@ try {
       }
     });
   });
-  console.log('📊 ERROR SUMMARY\n');
-  console.log(`  Total Test Failures:     ${totalTestsFailed}`);
-  console.log(`  Total Error Messages:    ${totalErrors}`);
-  console.log(`  Files with Errors:       ${Object.keys(errorsByFile).length}\n`);
+  logger.log('📊 ERROR SUMMARY\n');
+  logger.log(`  Total Test Failures:     ${totalTestsFailed}`);
+  logger.log(`  Total Error Messages:    ${totalErrors}`);
+  logger.log(`  Files with Errors:       ${Object.keys(errorsByFile).length}\n`);
   if (Object.keys(errorsByFile).length === 0) {
-    console.log('✅ NO ERRORS FOUND - All tests are passing!\n');
-    console.log('='.repeat(80) + '\n');
+    logger.log('✅ NO ERRORS FOUND - All tests are passing!\n');
+    logger.log('='.repeat(80) + '\n');
     process.exit(0);
   }
-  console.log('='.repeat(80) + '\n');
+  logger.log('='.repeat(80) + '\n');
   let fileNumber = 1;
   Object.entries(errorsByFile).forEach(([fileName, errors]) => {
-    console.log(`${fileNumber}. 📄 ${fileName}`);
-    console.log(`   ${errors.length} error(s)\n`);
+    logger.log(`${fileNumber}. 📄 ${fileName}`);
+    logger.log(`   ${errors.length} error(s)\n`);
     errors.forEach((error, index) => {
-      console.log(`   ${index + 1}. ❌ Test: ${error.test}`);
-      console.log(`      Line: ${error.line}`);
-      console.log(`      Error: ${error.error}`);
+      logger.log(`   ${index + 1}. ❌ Test: ${error.test}`);
+      logger.log(`      Line: ${error.line}`);
+      logger.log(`      Error: ${error.error}`);
       try {
         const fileContent = fs.readFileSync(fileName, 'utf-8');
         const lines = fileContent.split('\n');
@@ -119,26 +122,26 @@ try {
         if (lineNum >= 0 && lineNum < lines.length) {
           const contextStart = Math.max(0, lineNum - 2);
           const contextEnd = Math.min(lines.length, lineNum + 3);
-          console.log(`\n      Code Context:`);
+          logger.log(`\n      Code Context:`);
           for (let i = contextStart; i < contextEnd; i++) {
             const lineContent = lines[i];
             const lineMarker = i === lineNum ? '➜ ' : '  ';
             const lineDisplay = `${(i + 1).toString().padStart(4, ' ')} ${lineMarker} ${lineContent}`;
             if (i === lineNum) {
-              console.log(`      \x1b[31m${lineDisplay}\x1b[0m`);
+              logger.log(`      ${lineDisplay}`);
             } else {
-              console.log(`      ${lineDisplay}`);
+              logger.log(`      ${lineDisplay}`);
             }
           }
         }
       } catch (e) {}
-      console.log();
+      logger.log();
     });
     fileNumber++;
-    console.log();
+    logger.log();
   });
-  console.log('='.repeat(80) + '\n');
-  console.log('📋 ERROR CATEGORIES:\n');
+  logger.log('='.repeat(80) + '\n');
+  logger.log('📋 ERROR CATEGORIES:\n');
   const categories = {
     'Assertion Failures': 0,
     TypeError: 0,
@@ -165,33 +168,33 @@ try {
     if (count > 0) {
       const percentage = Math.round((count / totalErrors) * 100);
       const bar = '█'.repeat(percentage / 5);
-      console.log(
+      logger.log(
         `  ${category.padEnd(25)} ${count.toString().padStart(3, ' ')} (${percentage}%) ${bar}`
       );
     }
   });
-  console.log('\n' + '='.repeat(80) + '\n');
-  console.log('💡 SUGGESTIONS FOR FIXING ERRORS:\n');
+  logger.log('\n' + '='.repeat(80) + '\n');
+  logger.log('💡 SUGGESTIONS FOR FIXING ERRORS:\n');
   if (categories['Expected vs Actual'] > 0) {
-    console.log('  1. Check assertion expectations vs actual values');
-    console.log('     Review the test expectations and implementation\n');
+    logger.log('  1. Check assertion expectations vs actual values');
+    logger.log('     Review the test expectations and implementation\n');
   }
 
   if (categories['TypeError'] > 0) {
-    console.log('  2. Fix type-related issues');
-    console.log('     Ensure variables have correct types and methods exist\n');
+    logger.log('  2. Fix type-related issues');
+    logger.log('     Ensure variables have correct types and methods exist\n');
   }
 
   if (categories['ReferenceError'] > 0) {
-    console.log('  3. Check for undefined variables or functions');
-    console.log('     Ensure all required variables are defined and imported\n');
+    logger.log('  3. Check for undefined variables or functions');
+    logger.log('     Ensure all required variables are defined and imported\n');
   }
-  console.log('  4. Run specific test file to debug:');
-  console.log('     npx jest <test-file> --verbose\n');
-  console.log('  5. Run single test to isolate issue:');
-  console.log('     npx jest <test-file> -t "test name"\n');
-  console.log('='.repeat(80) + '\n');
+  logger.log('  4. Run specific test file to debug:');
+  logger.log('     npx jest <test-file> --verbose\n');
+  logger.log('  5. Run single test to isolate issue:');
+  logger.log('     npx jest <test-file> -t "test name"\n');
+  logger.log('='.repeat(80) + '\n');
 } catch (error) {
-  console.log('Error running Jest:\n', error.message);
-  console.log('\n' + '='.repeat(80) + '\n');
+  logger.log('Error running Jest:\n' + error.message);
+  logger.log('\n' + '='.repeat(80) + '\n');
 }

@@ -222,17 +222,24 @@ function renderAthletes() {
 }
 
 function renderMiniTarget(shots, size = 64) {
+  const shotSize = typeof getShotSize === 'function' ? getShotSize() : 6;
   const shotCircles = (shots || [])
     .map((s, i) => {
-      const color = s.hit ? '#32D74B' : '#FF453A';
-      const r = 6;
-      const sw = 1.5;
-      const fontSize = 7;
+      const color = s.hit ? getHitColor() : getMissColor();
+      const labelColor = s.hit ? getHitLabelColor() : getMissLabelColor();
+      const r = shotSize;
+      const sw = (shotSize / 6) * 1.5;
+      const fontSize = (shotSize / 6) * 7;
+      const labelContent = getShotLabelContent();
+      let labelText = '';
+      if (labelContent === 'number') labelText = s.shot || i + 1;
+      else if (labelContent === 'ring') labelText = s.ring !== undefined ? s.ring : '0';
+
       return `
             <g>
                 <circle cx="${s.x}" cy="${s.y}" r="${r}" fill="${color}" stroke="white" stroke-width="${sw}" />
-                <text x="${s.x}" y="${s.y + 0.5}" text-anchor="middle" dominant-baseline="central" fill="white"
-                      style="font-size: ${fontSize}px; font-weight: bold; font-family: sans-serif;">${s.shot || i + 1}</text>
+                <text x="${s.x}" y="${s.y + (shotSize / 6) * 0.5}" text-anchor="middle" dominant-baseline="central" fill="${labelColor}"
+                      style="font-size: ${fontSize}px; font-weight: bold; font-family: sans-serif;">${labelText}</text>
             </g>
         `;
     })
@@ -341,10 +348,15 @@ function renderSeriesList(series, athleteId) {
           return `<div class="w-2 h-2 rounded-full ${statusColor} shadow-sm"></div>`;
         })
         .join('');
+      const isZeroing = s.type === 'zeroing';
+      const bgClass = isZeroing 
+        ? 'bg-yellow-500/5 hover:bg-yellow-500/10 border-yellow-500/20' 
+        : 'bg-white/[0.03] hover:bg-white/[0.06] border-subtle/20';
+
       return `
             <div id="series-card-${s.id}" class="series-card-container">
                 <div onclick="toggleSeriesDetail('${s.id}')"
-                     class="group flex items-center gap-4 p-4 bg-white/[0.03] hover:bg-white/[0.06] rounded-2xl border border-subtle/20 active:scale-[0.99] transition-all cursor-pointer">
+                     class="group flex items-center gap-4 p-4 ${bgClass} rounded-2xl border active:scale-[0.99] transition-all cursor-pointer">
 
                     <!-- Left: Mini Target (Larger) -->
                     <div class="shrink-0">

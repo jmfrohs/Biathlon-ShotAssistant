@@ -27,12 +27,58 @@ SOFTWARE.
  * Tests utility functions and helper methods
  */
 
+
+const fs = require('fs');
+const path = require('path');
+
+// Mock t function for translation tests
+global.t = jest.fn((key) => `translated_${key}`);
+
+
+// Load the script
+const utilsCode = fs.readFileSync(path.resolve(__dirname, '../src/js/utils/utils.js'), 'utf8');
+(function() {
+  eval(utilsCode);
+  // Explicitly export functions to global if they are not there
+  global.getLanguage = getLanguage;
+  global.setLanguage = setLanguage;
+  global.translateApp = translateApp;
+})();
+
+
 describe('Utils Module (src)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    localStorage.clear();
+    document.body.innerHTML = '';
   });
 
-  test('should exist and be loadable', () => {
-    expect(true).toBe(true);
+  test('getLanguage should return default "de" if no language is set', () => {
+    expect(getLanguage()).toBe('de');
+  });
+
+  test('getLanguage should return stored language', () => {
+    localStorage.setItem('b_language', 'en');
+    expect(getLanguage()).toBe('en');
+  });
+
+  test('setLanguage should store language in localStorage', () => {
+    setLanguage('fr');
+    expect(localStorage.getItem('b_language')).toBe('fr');
+  });
+
+  test('translateApp should update textContent of elements with data-i18n', () => {
+    document.body.innerHTML = `
+      <div data-i18n="settings"></div>
+      <input data-i18n="search_placeholder" placeholder="old">
+      <nav id="nav-athletes"><span></span><span></span></nav>
+    `;
+    
+    translateApp();
+    
+    expect(document.querySelector('[data-i18n="settings"]').textContent).toBe('translated_settings');
+    expect(document.querySelector('[data-i18n="search_placeholder"]').placeholder).toBe('translated_search_placeholder');
+    expect(document.querySelector('#nav-athletes span:last-child').textContent).toBe('translated_athletes');
   });
 });
+

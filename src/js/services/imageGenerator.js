@@ -29,14 +29,15 @@ function getTargetSvgBase() {
 
 function generateTargetSvg(shots, seriesIndex = null) {
   let hitMarks = '';
+  const shotSize = typeof getShotSize === 'function' ? getShotSize() : 6;
   shots.forEach((shot) => {
     if (shot) {
       const fill_color = shot.hit ? '#228B22' : '#ef4444';
       const opacity = 1;
       const number_fill = shot.ring >= 4 ? 'white' : 'black';
-      const text_font_size = shot.ring === 0 ? '7px' : '6px';
-      hitMarks += `<circle cx="${shot.x}" cy="${shot.y}" r="6" class="hit-mark" style="fill: ${fill_color}; opacity: ${opacity};"></circle>`;
-      hitMarks += `<text x="${shot.x}" y="${shot.y + 0.5}" class="shot-number" style="fill: ${number_fill}; font-size: ${text_font_size};">${shot.shot}</text>`;
+      const fontSize = (shotSize / 6) * 6; // Base font size was 6px in this file
+      hitMarks += `<circle cx="${shot.x}" cy="${shot.y}" r="${shotSize}" class="hit-mark" style="fill: ${fill_color}; opacity: ${opacity};"></circle>`;
+      hitMarks += `<text x="${shot.x}" y="${shot.y + (shotSize / 6) * 0.5}" class="shot-number" style="fill: ${number_fill}; font-size: ${fontSize}px; text-anchor: middle; dominant-baseline: central;">${shot.shot}</text>`;
     }
   });
   const svgId = seriesIndex !== null ? `history-svg-${seriesIndex}` : 'biathlon-target';

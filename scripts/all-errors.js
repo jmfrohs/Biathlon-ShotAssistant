@@ -31,12 +31,15 @@ SOFTWARE.
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
-console.log('\n' + '='.repeat(90));
-console.log('          🔍 COMPREHENSIVE ERROR REPORT - Tests & Source Code');
-console.log('='.repeat(90) + '\n');
+const TestLogger = require('./test-logger');
+const logger = new TestLogger('all-errors');
+
+logger.log('\n' + '='.repeat(90));
+logger.log('          🔍 COMPREHENSIVE ERROR REPORT - Tests & Source Code');
+logger.log('='.repeat(90) + '\n');
 let totalErrors = 0;
 const allErrors = [];
-console.log('📋 CHECKING TEST ERRORS...\n');
+logger.log('📋 CHECKING TEST ERRORS...\n');
 try {
   const command =
     process.platform === 'win32'
@@ -73,7 +76,7 @@ try {
     });
   });
 } catch (e) {}
-console.log('📋 CHECKING SOURCE CODE ERRORS...\n');
+logger.log('📋 CHECKING SOURCE CODE ERRORS...\n');
 
 /**
  * Recursively find all files with specified extension
@@ -129,9 +132,9 @@ allSourceFiles.forEach((filePath) => {
   });
 });
 if (allErrors.length === 0) {
-  console.log('✅ NO ERRORS FOUND!\n');
-  console.log('Test Status:  ✅ All tests passing');
-  console.log('Source Code:  ✅ No syntax errors detected\n');
+  logger.log('✅ NO ERRORS FOUND!\n');
+  logger.log('Test Status:  ✅ All tests passing');
+  logger.log('Source Code:  ✅ No syntax errors detected\n');
 } else {
   const byType = {};
   allErrors.forEach((err) => {
@@ -140,23 +143,23 @@ if (allErrors.length === 0) {
   });
   Object.keys(byType).forEach((type) => {
     const errors = byType[type];
-    console.log(`\n${type === 'TEST' ? '❌' : '⚠️'} ${type} ERRORS (${errors.length}):`);
-    console.log('-'.repeat(90));
+    logger.log(`\n${type === 'TEST' ? '❌' : '⚠️'} ${type} ERRORS (${errors.length}):`);
+    logger.log('-'.repeat(90));
     errors.forEach((err, idx) => {
-      console.log(`\n  ${idx + 1}. ${err.file}:${err.line}`);
-      console.log(`     Error: ${err.error.substring(0, 100)}`);
+      logger.log(`\n  ${idx + 1}. ${err.file}:${err.line}`);
+      logger.log(`     Error: ${err.error.substring(0, 100)}`);
       if (err.context) {
-        console.log(`     Code: ${err.context.substring(0, 80)}`);
+        logger.log(`     Code: ${err.context.substring(0, 80)}`);
       }
 
       if (err.testName) {
-        console.log(`     Test: ${err.testName}`);
+        logger.log(`     Test: ${err.testName}`);
       }
     });
   });
-  console.log('\n' + '='.repeat(90));
-  console.log(`📊 ERROR SUMMARY: ${allErrors.length} total error(s) found`);
-  console.log('='.repeat(90) + '\n');
+  logger.log('\n' + '='.repeat(90));
+  logger.log(`📊 ERROR SUMMARY: ${allErrors.length} total error(s) found`);
+  logger.log('='.repeat(90) + '\n');
 }
 try {
   if (fs.existsSync('.jest-output.json')) {

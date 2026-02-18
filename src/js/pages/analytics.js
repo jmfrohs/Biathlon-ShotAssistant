@@ -39,6 +39,8 @@ class AnalyticsPage {
     this.currentAthleteFilter = 'all';
     this.currentSeriesFilter = 'all';
     this.currentAthlete = null;
+    this.currentShots = [];
+    this.currentSeriesList = [];
     this.init();
   }
 
@@ -136,7 +138,7 @@ class AnalyticsPage {
         });
       }
     });
-    this.updateAnalysis(allShots, totalSeries);
+    this.updateAnalysis(allShots, totalSeries, []); // passing empty series list for general overview
   }
 
   renderAthleteFilters() {
@@ -279,7 +281,7 @@ class AnalyticsPage {
         allShots = allShots.concat(s.shots);
       }
     });
-    this.updateAnalysis(allShots, athleteSeries.length);
+    this.updateAnalysis(allShots, athleteSeries.length, athleteSeries);
   }
 
   renderSeriesFilters(currentFilteredList, totalCount) {
@@ -451,7 +453,10 @@ class AnalyticsPage {
     if (modalBtn) {
       modalBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        this.openSeriesDetail(s);
+        this.openTargetModal({
+          type: 'series',
+          series: s
+        });
       });
     }
     return card;
@@ -475,15 +480,22 @@ class AnalyticsPage {
   }
 
   renderMiniTarget(shots, showNumbers = true) {
+    const shotSize = typeof getShotSize === 'function' ? getShotSize() : 6;
     const shotCircles = (shots || [])
       .map((s, i) => {
-        const color = s.hit ? '#32D74B' : '#FF453A';
-        const r = 6;
-        const sw = 1.5;
-        const fontSize = 7;
-        const textElement = showNumbers
-          ? `<text x="${s.x}" y="${s.y + 0.5}" text-anchor="middle" dominant-baseline="central" fill="white"
-                          style="font-size: ${fontSize}px; font-weight: bold; font-family: sans-serif;">${s.shot || i + 1}</text>`
+        const color = s.hit ? getHitColor() : getMissColor();
+        const labelColor = s.hit ? getHitLabelColor() : getMissLabelColor();
+        const r = shotSize;
+        const sw = (shotSize / 6) * 1.5;
+        const fontSize = (shotSize / 6) * 7;
+        const labelContent = getShotLabelContent();
+        let labelText = '';
+        if (labelContent === 'number') labelText = s.shot || i + 1;
+        else if (labelContent === 'ring') labelText = s.ring !== undefined ? s.ring : '0';
+
+        const textElement = (showNumbers && labelContent !== 'none')
+          ? `<text x="${s.x}" y="${s.y + (shotSize / 6) * 0.5}" text-anchor="middle" dominant-baseline="central" fill="${labelColor}"
+                          style="font-size: ${fontSize}px; font-weight: bold; font-family: sans-serif;">${labelText}</text>`
           : '';
         return `
                 <g>
@@ -584,15 +596,36 @@ class AnalyticsPage {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
 
-  openSeriesDetail(series) {
+  openTargetModal(data) {
     const modal = document.getElementById('targetPreviewModal');
     const container = document.getElementById('largeTargetContainer');
     const editBtn = document.getElementById('modalEditSeriesBtn');
+    const titleEl = modal ? modal.querySelector('[data-i18n="target_analysis"]') : null;
+
     if (!modal || !container || !editBtn) return;
-    container.innerHTML = this.renderMiniTarget(series.shots);
-    editBtn.onclick = () => {
-      window.location.href = `shooting.html?series=${series.id}&session=${series.sessionId}&athleteId=${series.athleteId}`;
-    };
+
+    if (data.type === 'series') {
+      const s = data.series;
+      container.innerHTML = this.renderMiniTarget(s.shots);
+      if (titleEl) titleEl.textContent = t('target_analysis') || 'Treffbild Analyse';
+      editBtn.classList.remove('hidden');
+      editBtn.onclick = () => {
+        window.location.href = `shooting.html?series=${s.id}&session=${s.sessionId}&athleteId=${s.athleteId}`;
+      };
+    } else if (data.type === 'heatmap') {
+      container.innerHTML = this.renderHeatmap(data.shots);
+      if (titleEl) titleEl.textContent = t('heatmap_analysis') || 'Heatmap Analyse';
+      editBtn.classList.add('hidden');
+    } else if (data.type === 'combined') {
+      container.innerHTML = this.renderMiniTarget(data.shots, false);
+      if (titleEl) titleEl.textContent = t('combined_accuracy') || 'Gesamtplatzierung';
+      editBtn.classList.add('hidden');
+    } else if (data.type === 'trend') {
+      container.innerHTML = this.renderTrendChart(data.series, true);
+      if (titleEl) titleEl.textContent = t('performance_trend') || 'Leistungsverlauf';
+      editBtn.classList.add('hidden');
+    }
+
     modal.classList.remove('hidden');
     const closeBtn = document.getElementById('closeTargetPreviewBtn');
     if (closeBtn) {
@@ -603,29 +636,125 @@ class AnalyticsPage {
     };
   }
 
-  updateAnalysis(shots, seriesCount = 0) {
+  updateAnalysis(shots, seriesCount = 0, seriesList = []) {
+    this.currentShots = shots;
+    this.currentSeriesList = seriesList;
     const totalShots = shots.length;
     const hitCount = shots.filter((s) => s.hit).length;
     const totalRings = shots.reduce((sum, s) => sum + (s.ring || 0), 0);
     const hitRate = totalShots > 0 ? Math.round((hitCount / totalShots) * 100) : 0;
     const avgRings = totalShots > 0 ? (totalRings / totalShots).toFixed(1) : '0.0';
+
     const elSeries = document.getElementById('stat-total-series');
     const elRate = document.getElementById('stat-hit-rate');
     const elRings = document.getElementById('stat-avg-rings');
     const elShots = document.getElementById('stat-total-shots');
+
     if (elSeries) elSeries.textContent = seriesCount;
     if (elRate) elRate.textContent = `${hitRate}%`;
     if (elRings) elRings.textContent = avgRings;
     if (elShots) elShots.textContent = totalShots;
+
     const heatmapContainer = document.getElementById('heatmap-container');
     const totalContainer = document.getElementById('total-placements-container');
+    const trendContainer = document.getElementById('trend-chart-container');
+
     if (heatmapContainer) {
       heatmapContainer.innerHTML = this.renderHeatmap(shots);
+      heatmapContainer.onclick = () => {
+        this.openTargetModal({
+          type: 'heatmap',
+          shots: this.currentShots
+        });
+      };
     }
 
     if (totalContainer) {
       totalContainer.innerHTML = this.renderMiniTarget(shots, false);
+      totalContainer.onclick = () => {
+        this.openTargetModal({
+          type: 'combined',
+          shots: this.currentShots
+        });
+      };
     }
+
+    if (trendContainer) {
+      trendContainer.innerHTML = this.renderTrendChart(seriesList);
+      trendContainer.onclick = () => {
+        this.openTargetModal({
+          type: 'trend',
+          series: this.currentSeriesList
+        });
+      };
+    }
+  }
+
+  renderTrendChart(series, isLarge = false) {
+    if (!series || series.length === 0) {
+      return `<div class="w-full h-full flex items-center justify-center text-zinc-500 text-xs italic">${t('no_trend_data') || 'Keine Daten für Trend'}</div>`;
+    }
+
+    // Group by day
+    const dayData = {};
+    series.forEach(s => {
+      if (!s.timestamp || s.isPlaceholder) return;
+      const date = new Date(s.timestamp).toLocaleDateString();
+      if (!dayData[date]) {
+        dayData[date] = { hits: 0, total: 0, time: new Date(s.timestamp).getTime() };
+      }
+      const h = s.shots ? s.shots.filter(sh => sh.hit).length : 0;
+      const t = s.shots ? s.shots.length : 0;
+      dayData[date].hits += h;
+      dayData[date].total += t;
+    });
+
+    const sortedDays = Object.keys(dayData)
+      .map(d => ({ date: d, ...dayData[d] }))
+      .sort((a, b) => a.time - b.time);
+
+    if (sortedDays.length === 0) {
+      return `<div class="w-full h-full flex items-center justify-center text-zinc-500 text-xs italic">${t('no_trend_data') || 'Keine Daten für Trend'}</div>`;
+    }
+
+    const width = isLarge ? 400 : 300;
+    const height = isLarge ? 300 : 150;
+    const padding = 30;
+    const chartWidth = width - padding * 2;
+    const chartHeight = height - padding * 2;
+
+    const points = sortedDays.map((d, i) => {
+      const x = padding + (sortedDays.length > 1 ? (i / (sortedDays.length - 1)) * chartWidth : chartWidth / 2);
+      const hitRate = d.total > 0 ? (d.hits / d.total) : 0;
+      const y = padding + (1 - hitRate) * chartHeight;
+      return { x, y, hitRate, date: d.date };
+    });
+
+    let pathD = `M ${points[0].x} ${points[0].y}`;
+    points.forEach((p, i) => {
+      if (i > 0) pathD += ` L ${p.x} ${p.y}`;
+    });
+
+    const dots = points.map(p => `
+      <circle cx="${p.x}" cy="${p.y}" r="${isLarge ? 4 : 3}" fill="#007AFF" stroke="white" stroke-width="1.5" />
+      <text x="${p.x}" y="${height - 10}" font-size="8" fill="#8E8E93" text-anchor="middle" class="font-bold">${p.date.split('.')[0]}.${p.date.split('.')[1]}</text>
+    `).join('');
+
+    return `
+      <svg viewBox="0 0 ${width} ${height}" class="w-full h-full">
+        <!-- Grid -->
+        <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${height - padding}" stroke="#8E8E93" stroke-width="0.5" opacity="0.3" />
+        <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" stroke="#8E8E93" stroke-width="0.5" opacity="0.3" />
+        
+        <text x="${padding - 5}" y="${padding + 5}" font-size="8" fill="#8E8E93" text-anchor="end">100%</text>
+        <text x="${padding - 5}" y="${height - padding}" font-size="8" fill="#8E8E93" text-anchor="end">0%</text>
+
+        <!-- Path -->
+        <path d="${pathD}" fill="none" stroke="#007AFF" stroke-width="${isLarge ? 4 : 3}" stroke-linecap="round" stroke-linejoin="round" />
+        
+        ${dots}
+      </svg>
+    `;
   }
 
   renderHeatmap(shots) {

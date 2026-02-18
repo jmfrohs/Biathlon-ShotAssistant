@@ -1,3 +1,4 @@
+/** @jest-environment jsdom */
 /*
 MIT License
 
@@ -27,12 +28,58 @@ SOFTWARE.
  * Tests analytics functionality
  */
 
+
+const fs = require('fs');
+const path = require('path');
+
+// Load the script
+const analyticsCode = fs.readFileSync(path.resolve(__dirname, '../src/js/pages/analytics.js'), 'utf8');
+
+// Mock AnalyticsPage dependencies
+const mockElements = {
+  'analytics-content': document.createElement('div'),
+  'analysis-content': document.createElement('div'),
+  'athlete-filter': document.createElement('div'),
+  'series-filter': document.createElement('div'),
+};
+
+
+
+const vm = require('vm');
+
+document.getElementById = jest.fn((id) => mockElements[id] || document.createElement('div'));
+
+// Execute the script in the window context
+vm.runInNewContext(analyticsCode, window);
+
+// Promote AnalyticsPage from window to global
+global.AnalyticsPage = window.AnalyticsPage;
+
+
+
 describe('Analytics Module', () => {
+  let page;
+
   beforeEach(() => {
     jest.clearAllMocks();
+    page = new AnalyticsPage();
   });
 
-  test('should exist and be loadable', () => {
-    expect(true).toBe(true);
+  test('getInitials should return first letter of each name', () => {
+    expect(page.getInitials('John Doe')).toBe('JD');
+    expect(page.getInitials('Alice')).toBe('A');
+    expect(page.getInitials('')).toBe('');
+  });
+
+  test('escapeHtml should sanitize HTML characters', () => {
+    expect(page.escapeHtml('<b>Text</b>')).toBe('&lt;b&gt;Text&lt;/b&gt;');
+    expect(page.escapeHtml('"Quote"')).toBe('&quot;Quote&quot;');
+  });
+
+  test('renderWindFlag should return SVG string', () => {
+    const svg = page.renderWindFlag(45);
+    expect(svg).toContain('<svg');
+    expect(svg).toContain('rotate(45');
   });
 });
+

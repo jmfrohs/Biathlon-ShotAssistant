@@ -145,3 +145,36 @@ function getTargetConstants() {
     name: type === 'scheibe2' ? SCHEIBE_2_NAME : SCHEIBE_1_NAME,
   };
 }
+
+
+function getShotSize() {
+  return parseFloat(localStorage.getItem('b_shot_size')) || 6;
+}
+
+function getHitColor() {
+  return localStorage.getItem('b_hit_color') || '#32D74B';
+}
+
+function getHitLabelColor() {
+  return localStorage.getItem('b_hit_label_color') || '#FFFFFF';
+}
+
+function getMissColor() {
+  return localStorage.getItem('b_miss_color') || '#FF453A';
+}
+
+function getMissLabelColor() {
+  return localStorage.getItem('b_miss_label_color') || '#FFFFFF';
+}
+
+function getGhostShotColor() {
+  return localStorage.getItem('b_ghost_shot_color') || '#007AFF';
+}
+
+function getGhostLabelColor() {
+  return localStorage.getItem('b_ghost_label_color') || '#FFFFFF';
+}
+
+function getShotLabelContent() {
+  return localStorage.getItem('b_shot_label_content') || 'number';
+}

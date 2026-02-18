@@ -29,6 +29,12 @@ SOFTWARE.
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport" />
   <title>Settings - Biathlon Shooting Assistant</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="assets/images/app-icon.png">
+  <meta name="theme-color" content="#0f172a">
+
   <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
   <script src="js/core/theme-manager.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -86,9 +92,9 @@ SOFTWARE.
 <body class="text-off-white min-h-screen flex justify-center items-center bg-deep-charcoal">
   <div id="app-container"
     class="w-full max-w-[430px] h-[932px] bg-deep-charcoal relative overflow-hidden flex flex-col shadow-2xl md:rounded-[55px] md:border-[8px] md:border-zinc-800">
-    <div class="status-bar px-8 pt-12 pb-2 flex justify-between items-center text-base font-semibold text-off-white">
+    <div class="status-bar px-8 pt-6 pb-2 flex justify-between items-center text-base font-semibold text-off-white">
     </div>
-    <header class="px-6 py-6">
+    <header class="px-6 pt-2 pb-6">
       <div class="flex items-center gap-4">
         <div class="space-y-1">
           <h1 class="text-3xl font-bold tracking-tight text-off-white" data-i18n="settings">Settings</h1>
@@ -425,6 +431,31 @@ SOFTWARE.
             </div>
             <div class="flex items-center gap-1">
               <span id="click-value-display" class="text-light-blue-info text-sm">3.0 mm</span>
+              <span class="material-symbols-outlined text-zinc-600">chevron_right</span>
+            </div>
+          </div>
+          <div class="p-4 flex items-center justify-between hover:bg-off-white/5 transition-colors cursor-pointer"
+            onclick="openShotSizeModal()">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-indigo-500/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-indigo-400 text-xl">blur_on</span>
+              </div>
+              <span class="text-off-white font-medium" data-i18n="shot_size">Shot Size</span>
+            </div>
+            <div class="flex items-center gap-1">
+              <span id="shot-size-display" class="text-light-blue-info text-sm">Medium (6px)</span>
+              <span class="material-symbols-outlined text-zinc-600">chevron_right</span>
+            </div>
+          </div>
+          <div class="p-4 flex items-center justify-between hover:bg-off-white/5 transition-colors cursor-pointer"
+            onclick="openShotAppearanceModal()">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                <span class="material-symbols-outlined text-rose-400 text-xl">palette</span>
+              </div>
+              <span class="text-off-white font-medium" data-i18n="shot_appearance">Shot Appearance</span>
+            </div>
+            <div class="flex items-center gap-1">
               <span class="material-symbols-outlined text-zinc-600">chevron_right</span>
             </div>
           </div>
@@ -891,6 +922,158 @@ SOFTWARE.
     </div>
   </div>
 
+  <!-- Shot Size Selection Modal -->
+  <div id="shot-size-modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center px-6"
+    onclick="closeShotSizeModal(event)">
+    <div class="bg-card-dark rounded-3xl p-6 max-w-sm w-full border border-subtle" onclick="event.stopPropagation()">
+      <h3 class="text-xl font-bold text-off-white mb-4" data-i18n="select_shot_size">Select Shot Size</h3>
+      <p class="text-sm text-zinc-400 mb-4" data-i18n="shot_size_desc">
+        Choose the visual size of the shot markers on the target.
+      </p>
+      <div class="space-y-3">
+        <button onclick="saveShotSize(4)" id="shot-size-4-btn"
+          class="w-full p-4 bg-off-white/5 hover:bg-off-white/10 rounded-xl border border-subtle text-left transition-all active:scale-95">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-off-white font-semibold" data-i18n="shot_size_small">Small (4px)</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-2xl hidden"
+              id="check-shot-size-4">check_circle</span>
+          </div>
+        </button>
+        <button onclick="saveShotSize(6)" id="shot-size-6-btn"
+          class="w-full p-4 bg-off-white/5 hover:bg-off-white/10 rounded-xl border border-subtle text-left transition-all active:scale-95">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-off-white font-semibold" data-i18n="shot_size_medium">Medium (6px)</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-2xl hidden"
+              id="check-shot-size-6">check_circle</span>
+          </div>
+        </button>
+        <button onclick="saveShotSize(8)" id="shot-size-8-btn"
+          class="w-full p-4 bg-off-white/5 hover:bg-off-white/10 rounded-xl border border-subtle text-left transition-all active:scale-95">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-off-white font-semibold" data-i18n="shot_size_large">Large (8px)</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-2xl hidden"
+              id="check-shot-size-8">check_circle</span>
+          </div>
+        </button>
+        <button onclick="saveShotSize(10)" id="shot-size-10-btn"
+          class="w-full p-4 bg-off-white/5 hover:bg-off-white/10 rounded-xl border border-subtle text-left transition-all active:scale-95">
+          <div class="flex items-center justify-between">
+            <div>
+              <p class="text-off-white font-semibold" data-i18n="shot_size_xl">Extra Large (10px)</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-2xl hidden"
+              id="check-shot-size-10">check_circle</span>
+          </div>
+        </button>
+
+        <!-- Custom Shot Size -->
+        <div class="pt-3 border-t border-subtle">
+          <label class="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2"
+            data-i18n="custom_value">Custom Value</label>
+          <div class="flex gap-2">
+            <input type="number" id="custom-shot-input" placeholder="e.g. 5" step="0.5" min="2" max="20"
+              class="flex-1 bg-off-white/5 border border-subtle rounded-xl px-3 py-2 text-sm text-off-white focus:outline-none focus:border-primary" />
+            <button onclick="saveCustomShotSize()"
+              class="bg-primary text-white px-4 py-2 rounded-xl font-semibold text-sm active:scale-95 transition-transform"
+              data-i18n="apply">
+              Apply
+            </button>
+          </div>
+          <p class="text-xs text-zinc-400 mt-1" data-i18n="shot_size_range">Range: 2 - 20 px</p>
+        </div>
+      </div>
+      <button onclick="closeShotSizeModal()"
+        class="w-full mt-4 bg-off-white/5 text-off-white py-3 rounded-xl font-semibold active:scale-95 transition-transform"
+        data-i18n="close">
+        Close
+      </button>
+    </div>
+  </div>
+
+  <!-- Shot Appearance Selection Modal -->
+  <div id="shot-appearance-modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center px-6"
+    onclick="closeShotAppearanceModal(event)">
+    <div class="bg-card-dark rounded-3xl p-6 max-w-sm w-full border border-subtle" onclick="event.stopPropagation()">
+      <h3 class="text-xl font-bold text-off-white mb-4" data-i18n="shot_appearance">Shot Appearance</h3>
+
+      <div class="mb-6">
+        <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider block mb-2"
+          data-i18n="shot_label_content">Label Content</label>
+        <select id="shot-label-content-select"
+          class="w-full bg-white/[0.05] border border-subtle/20 rounded-xl px-4 py-3 text-off-white focus:outline-none focus:border-primary transition-colors text-sm"
+          onchange="saveColors()">
+          <option value="number" data-i18n="label_number">Number (1-5)</option>
+          <option value="ring" data-i18n="label_ring">Ring Value</option>
+          <option value="none" data-i18n="label_none">None</option>
+        </select>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Hit Color -->
+        <div class="space-y-3 p-3 bg-white/[0.02] rounded-2xl border border-subtle/10">
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-off-white" data-i18n="hit_color">Hit Color</label>
+            <input type="color" id="hit-color-picker" class="w-10 h-10 bg-transparent border-0 cursor-pointer"
+              onchange="saveColors()" />
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider" data-i18n="hit_label_color">Hit
+              Label Color</label>
+            <input type="color" id="hit-label-color-picker" class="w-8 h-8 bg-transparent border-0 cursor-pointer"
+              onchange="saveColors()" />
+          </div>
+        </div>
+
+        <!-- Miss Color -->
+        <div class="space-y-3 p-3 bg-white/[0.02] rounded-2xl border border-subtle/10">
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-off-white" data-i18n="miss_color">Miss Color</label>
+            <input type="color" id="miss-color-picker" class="w-10 h-10 bg-transparent border-0 cursor-pointer"
+              onchange="saveColors()" />
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider"
+              data-i18n="miss_label_color">Miss Label Color</label>
+            <input type="color" id="miss-label-color-picker" class="w-8 h-8 bg-transparent border-0 cursor-pointer"
+              onchange="saveColors()" />
+          </div>
+        </div>
+
+        <!-- Analysis Marker Color -->
+        <div class="space-y-3 p-3 bg-white/[0.02] rounded-2xl border border-subtle/10">
+          <div class="flex items-center justify-between">
+            <label class="text-sm font-medium text-off-white" data-i18n="ghost_shot_color">Ghost Marker Color</label>
+            <input type="color" id="ghost-color-picker" class="w-10 h-10 bg-transparent border-0 cursor-pointer"
+              onchange="saveColors()" />
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-bold text-zinc-500 uppercase tracking-wider"
+              data-i18n="ghost_label_color">Ghost Label Color</label>
+            <input type="color" id="ghost-label-color-picker" class="w-8 h-8 bg-transparent border-0 cursor-pointer"
+              onchange="saveColors()" />
+          </div>
+        </div>
+
+        <!-- Reset to Default -->
+        <button onclick="resetColorsToDefault()"
+          class="w-full mt-2 py-2 text-xs font-bold text-primary uppercase tracking-wider hover:underline"
+          data-i18n="reset_to_default">
+          Reset to Default
+        </button>
+      </div>
+
+      <button onclick="closeShotAppearanceModal()"
+        class="w-full mt-6 bg-off-white/5 text-off-white py-3 rounded-xl font-semibold active:scale-95 transition-transform"
+        data-i18n="close">
+        Close
+      </button>
+    </div>
   </div>
 
   <script src="js/pages/settings.js"></script>
@@ -966,6 +1149,10 @@ SOFTWARE.
       translateUI();
       // Initialize device size display
       updateDeviceSizeDisplay();
+      // Initialize shot size display
+      if (typeof updateShotSizeDisplay === 'function') {
+        updateShotSizeDisplay();
+      }
 
       // Initialize defaults
       if (typeof loadDefaultShootingTimes === 'function') {
@@ -1641,6 +1828,132 @@ SOFTWARE.
       }
     };
 
+    // --- Shot Size Functions ---
+    window.openShotSizeModal = function () {
+      const modal = document.getElementById('shot-size-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        updateShotSizeCheckmarks();
+      }
+    };
+
+    window.closeShotSizeModal = function (event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('shot-size-modal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.saveShotSize = function (value) {
+      localStorage.setItem('b_shot_size', value);
+      updateShotSizeDisplay();
+      updateShotSizeCheckmarks();
+      setTimeout(() => closeShotSizeModal(), 300);
+    };
+
+    window.updateShotSizeDisplay = function () {
+      const value = parseFloat(localStorage.getItem('b_shot_size')) || 6;
+      const display = document.getElementById('shot-size-display');
+      if (display) {
+        let label = `${value}px`;
+        if (value === 4) label = typeof t === 'function' ? t('shot_size_small') : 'Small (4px)';
+        else if (value === 6) label = typeof t === 'function' ? t('shot_size_medium') : 'Medium (6px)';
+        else if (value === 8) label = typeof t === 'function' ? t('shot_size_large') : 'Large (8px)';
+        else if (value === 10) label = typeof t === 'function' ? t('shot_size_xl') : 'Extra Large (10px)';
+
+        display.textContent = label;
+      }
+    };
+
+    window.updateShotSizeCheckmarks = function () {
+      const value = parseFloat(localStorage.getItem('b_shot_size')) || 6;
+      [4, 6, 8, 10].forEach(v => {
+        const btn = document.getElementById(`shot-size-${v}-btn`);
+        const check = document.getElementById(`check-shot-size-${v}`);
+        if (btn) {
+          if (v === value) {
+            btn.classList.add('bg-primary/20', 'border-primary');
+            btn.classList.remove('bg-off-white/5', 'border-subtle');
+          } else {
+            btn.classList.remove('bg-primary/20', 'border-primary');
+            btn.classList.add('bg-off-white/5', 'border-subtle');
+          }
+        }
+        if (check) {
+          if (v === value) check.classList.remove('hidden');
+          else check.classList.add('hidden');
+        }
+      });
+    };
+
+    window.saveCustomShotSize = function () {
+      const input = document.getElementById('custom-shot-input');
+      if (!input) return;
+      const value = parseFloat(input.value);
+      if (isNaN(value) || value < 2 || value > 20) {
+        alert(typeof t === 'function' ? t('invalid_shot_size') : 'Please enter a value between 2 and 20 px');
+        return;
+      }
+      saveShotSize(value);
+      input.value = '';
+    };
+
+    // --- Shot Appearance Functions ---
+    window.openShotAppearanceModal = function () {
+      const modal = document.getElementById('shot-appearance-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        document.getElementById('hit-color-picker').value = getHitColor();
+        document.getElementById('hit-label-color-picker').value = getHitLabelColor();
+        document.getElementById('miss-color-picker').value = getMissColor();
+        document.getElementById('miss-label-color-picker').value = getMissLabelColor();
+        document.getElementById('ghost-color-picker').value = getGhostShotColor();
+        document.getElementById('ghost-label-color-picker').value = getGhostLabelColor();
+        document.getElementById('shot-label-content-select').value = getShotLabelContent();
+      }
+    };
+
+    window.closeShotAppearanceModal = function (event) {
+      if (event && event.target !== event.currentTarget) return;
+      const modal = document.getElementById('shot-appearance-modal');
+      if (modal) modal.classList.add('hidden');
+    };
+
+    window.saveColors = function () {
+      const hitColor = document.getElementById('hit-color-picker').value;
+      const hitLabelColor = document.getElementById('hit-label-color-picker').value;
+      const missColor = document.getElementById('miss-color-picker').value;
+      const missLabelColor = document.getElementById('miss-label-color-picker').value;
+      const ghostColor = document.getElementById('ghost-color-picker').value;
+      const ghostLabelColor = document.getElementById('ghost-label-color-picker').value;
+      const labelContent = document.getElementById('shot-label-content-select').value;
+
+      localStorage.setItem('b_hit_color', hitColor);
+      localStorage.setItem('b_hit_label_color', hitLabelColor);
+      localStorage.setItem('b_miss_color', missColor);
+      localStorage.setItem('b_miss_label_color', missLabelColor);
+      localStorage.setItem('b_ghost_shot_color', ghostColor);
+      localStorage.setItem('b_ghost_label_color', ghostLabelColor);
+      localStorage.setItem('b_shot_label_content', labelContent);
+    };
+
+    window.resetColorsToDefault = function () {
+      localStorage.removeItem('b_hit_color');
+      localStorage.removeItem('b_hit_label_color');
+      localStorage.removeItem('b_miss_color');
+      localStorage.removeItem('b_miss_label_color');
+      localStorage.removeItem('b_ghost_shot_color');
+      localStorage.removeItem('b_ghost_label_color');
+      localStorage.removeItem('b_shot_label_content');
+
+      document.getElementById('hit-color-picker').value = getHitColor();
+      document.getElementById('hit-label-color-picker').value = getHitLabelColor();
+      document.getElementById('miss-color-picker').value = getMissColor();
+      document.getElementById('miss-label-color-picker').value = getMissLabelColor();
+      document.getElementById('ghost-color-picker').value = getGhostShotColor();
+      document.getElementById('ghost-label-color-picker').value = getGhostLabelColor();
+      document.getElementById('shot-label-content-select').value = getShotLabelContent();
+    };
+
     function updateDeviceSizeDisplay() {
       const size = localStorage.getItem('b_device_size') || 'phone';
       const display = document.getElementById('device-size-display');
@@ -1881,6 +2194,9 @@ SOFTWARE.
       // Initialize Click Value Display
       updateClickValueDisplay();
 
+      // Initialize Shot Size Display
+      updateShotSizeDisplay();
+
       // Initialize Theme UI
       updateThemeUI(getTheme());
 
@@ -1889,6 +2205,6 @@ SOFTWARE.
     })();
   </script>
   </div>
-
+</body>
 
 </html>

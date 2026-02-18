@@ -30,6 +30,9 @@ SOFTWARE.
 
 const fs = require('fs');
 const path = require('path');
+const TestLogger = require('./test-logger');
+const logger = new TestLogger('test-report');
+
 const testStats = {
   'Storage Module': {
     total: 6,
@@ -172,37 +175,38 @@ Object.values(testStats).forEach((module) => {
 });
 const averageCoverage = Math.round(totalCoverage / moduleCount);
 const passPercentage = Math.round((totalPassed / totalTests) * 100);
-console.log('\n' + '='.repeat(80));
-console.log('          TEST SUITE SUMMARY REPORT WITH PERCENTAGE METRICS');
-console.log('='.repeat(80) + '\n');
-console.log('📊 OVERALL STATISTICS:\n');
-console.log(`  Total Test Modules:    ${moduleCount}`);
-console.log(`  Total Test Cases:      ${totalTests}`);
-console.log(`  Tests Passed:          ${totalPassed}/${totalTests} (${passPercentage}%)`);
-console.log(`  Average Coverage:      ${averageCoverage}%`);
-console.log(
+
+logger.log('\n' + '='.repeat(80));
+logger.log('          TEST SUITE SUMMARY REPORT WITH PERCENTAGE METRICS');
+logger.log('='.repeat(80) + '\n');
+logger.log('📊 OVERALL STATISTICS:\n');
+logger.log(`  Total Test Modules:    ${moduleCount}`);
+logger.log(`  Total Test Cases:      ${totalTests}`);
+logger.log(`  Tests Passed:          ${totalPassed}/${totalTests} (${passPercentage}%)`);
+logger.log(`  Average Coverage:      ${averageCoverage}%`);
+logger.log(
   `  Status:                ${passPercentage === 100 ? '✅ ALL TESTS PASSING' : '⚠️  SOME TESTS FAILING'}\n`
 );
-console.log('='.repeat(80) + '\n');
-console.log('📋 DETAILED MODULE BREAKDOWN:\n');
+logger.log('='.repeat(80) + '\n');
+logger.log('📋 DETAILED MODULE BREAKDOWN:\n');
 let moduleNum = 1;
 Object.entries(testStats).forEach(([moduleName, stats]) => {
   const passRate = Math.round((stats.passed / stats.total) * 100);
   const statusIcon = passRate === 100 ? '✅' : passRate >= 90 ? '⚠️' : '❌';
-  console.log(`${moduleNum}. ${statusIcon} ${moduleName}`);
-  console.log(`   Tests:      ${stats.passed}/${stats.total} (${passRate}%)`);
-  console.log(`   Coverage:   ${stats.coverage}%`);
-  console.log(`   Details:`);
+  logger.log(`${moduleNum}. ${statusIcon} ${moduleName}`);
+  logger.log(`   Tests:      ${stats.passed}/${stats.total} (${passRate}%)`);
+  logger.log(`   Coverage:   ${stats.coverage}%`);
+  logger.log(`   Details:`);
   stats.tests.forEach((test) => {
     const percentage = parseInt(test.match(/\d+/)[0]);
     const icon = percentage === 100 ? '  ✓' : percentage >= 90 ? '  ◐' : '  ✗';
-    console.log(`     ${icon} ${test}`);
+    logger.log(`     ${icon} ${test}`);
   });
-  console.log('');
+  logger.log('');
   moduleNum++;
 });
-console.log('='.repeat(80) + '\n');
-console.log('📈 COVERAGE BY METRIC:\n');
+logger.log('='.repeat(80) + '\n');
+logger.log('📈 COVERAGE BY METRIC:\n');
 const coverageMetrics = {
   'Lines of Code': 82,
   Functions: 79,
@@ -213,10 +217,10 @@ const coverageMetrics = {
 };
 Object.entries(coverageMetrics).forEach(([metric, coverage]) => {
   const bar = generateProgressBar(coverage);
-  console.log(`  ${metric.padEnd(20)} ${bar} ${coverage}%`);
+  logger.log(`  ${metric.padEnd(20)} ${bar} ${coverage}%`);
 });
-console.log('\n' + '='.repeat(80) + '\n');
-console.log('🎯 TEST CATEGORIES DISTRIBUTION:\n');
+logger.log('\n' + '='.repeat(80) + '\n');
+logger.log('🎯 TEST CATEGORIES DISTRIBUTION:\n');
 const categories = {
   'Unit Tests': 56,
   'Integration Tests': 5,
@@ -226,27 +230,27 @@ const categories = {
 };
 Object.entries(categories).forEach(([category, percentage]) => {
   const bar = generateProgressBar(percentage);
-  console.log(`  ${category.padEnd(25)} ${bar} ${percentage}%`);
+  logger.log(`  ${category.padEnd(25)} ${bar} ${percentage}%`);
 });
-console.log('\n' + '='.repeat(80) + '\n');
-console.log('💡 RECOMMENDATIONS:\n');
+logger.log('\n' + '='.repeat(80) + '\n');
+logger.log('💡 RECOMMENDATIONS:\n');
 if (averageCoverage < 80) {
-  console.log('  ⚠️  Coverage below 80% - Consider adding more test cases');
+  logger.log('  ⚠️  Coverage below 80% - Consider adding more test cases');
 }
 
 if (passPercentage < 100) {
-  console.log('  ⚠️  Some tests failing - Review failed tests and fix issues');
+  logger.log('  ⚠️  Some tests failing - Review failed tests and fix issues');
 }
 
 if (averageCoverage >= 90 && passPercentage === 100) {
-  console.log('  ✅ Excellent test coverage and pass rate');
-  console.log('  ✅ All modules have high test quality');
-  console.log('  ✅ Continue with continuous integration');
+  logger.log('  ✅ Excellent test coverage and pass rate');
+  logger.log('  ✅ All modules have high test quality');
+  logger.log('  ✅ Continue with continuous integration');
 }
-console.log('\n' + '='.repeat(80) + '\n');
-console.log('Generated: ' + new Date().toLocaleString());
-console.log('Branch: test-branch');
-console.log('Status: ✅ Test Suite Ready for CI/CD Integration\n');
+logger.log('\n' + '='.repeat(80) + '\n');
+logger.log('Generated: ' + new Date().toLocaleString());
+logger.log('Branch: test-branch');
+logger.log('Status: ✅ Test Suite Ready for CI/CD Integration\n');
 
 /**
  * Generate a progress bar for visualization

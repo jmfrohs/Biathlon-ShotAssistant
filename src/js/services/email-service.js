@@ -115,28 +115,38 @@ class EmailService {
 
       shots.forEach((shot, index) => {
         if (shot && shot.x !== undefined && shot.y !== undefined) {
-          const color = shot.hit ? '#32D74B' : '#FF453A';
+          const color = shot.hit ? getHitColor() : getMissColor();
+          const labelColor = shot.hit ? getHitLabelColor() : getMissLabelColor();
+          const shotSize = typeof getShotSize === 'function' ? getShotSize() : 6;
+          
           const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
           const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
           circle.setAttribute('cx', shot.x);
           circle.setAttribute('cy', shot.y);
-          circle.setAttribute('r', '6');
+          circle.setAttribute('r', shotSize);
           circle.setAttribute('fill', color);
           circle.setAttribute('stroke', '#FFFFFF');
-          circle.setAttribute('stroke-width', '1.5');
+          circle.setAttribute('stroke-width', (shotSize / 6) * 1.5);
           g.appendChild(circle);
 
-          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text.setAttribute('x', shot.x);
-          text.setAttribute('y', shot.y + 0.5);
-          text.setAttribute('text-anchor', 'middle');
-          text.setAttribute('dominant-baseline', 'central');
-          text.setAttribute('fill', 'white');
-          text.setAttribute('font-size', '7');
-          text.setAttribute('font-weight', 'bold');
-          text.textContent = index + 1;
-          g.appendChild(text);
+          const labelContent = getShotLabelContent();
+          let labelText = '';
+          if (labelContent === 'number') labelText = index + 1;
+          else if (labelContent === 'ring') labelText = shot.ring !== undefined ? shot.ring : '0';
+
+          if (labelContent !== 'none') {
+            const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+            text.setAttribute('x', shot.x);
+            text.setAttribute('y', shot.y + (shotSize / 6) * 0.5);
+            text.setAttribute('text-anchor', 'middle');
+            text.setAttribute('dominant-baseline', 'central');
+            text.setAttribute('fill', labelColor);
+            text.setAttribute('font-size', (shotSize / 6) * 7);
+            text.setAttribute('font-weight', 'bold');
+            text.textContent = labelText;
+            g.appendChild(text);
+          }
 
           shotsGroup.appendChild(g);
         }
