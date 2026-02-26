@@ -49,16 +49,16 @@ select {
   padding: 6px 0;
   font-size: 13px;
   font-weight: 600;
-  color: #8E8E93;
+  color: #8e8e93;
   cursor: pointer;
   z-index: 1;
   transition: color 0.2s ease;
   border-radius: 10px;
 }
 
-.segmented-control input:checked+label {
+.segmented-control input:checked + label {
   color: white;
-  background: #007AFF;
+  background: #007aff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 

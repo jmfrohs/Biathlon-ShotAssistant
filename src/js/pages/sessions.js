@@ -117,8 +117,15 @@ function renderSessionsList(sessions) {
 
   const groups = {};
   sessions.forEach((session) => {
-    const date = new Date(session.date);
-    const dayKey = date.toISOString().split('T')[0];
+    // Normalize German DD.MM.YYYY format or any invalid date
+    let rawDate = session.date || '';
+    if (rawDate.match(/^\d{1,2}\.\d{1,2}\.\d{4}$/)) {
+      const parts = rawDate.split('.');
+      rawDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    const date = new Date(rawDate);
+    const isValid = !isNaN(date.getTime());
+    const dayKey = isValid ? date.toISOString().split('T')[0] : '1970-01-01';
     if (!groups[dayKey]) groups[dayKey] = [];
     groups[dayKey].push(session);
   });
@@ -227,7 +234,7 @@ function createSessionCard(session) {
       content.style.transition = 'none';
       isSwiping = true;
     },
-    { passive: true }
+    { passive: false }
   );
   content.addEventListener(
     'touchmove',
@@ -237,9 +244,15 @@ function createSessionCard(session) {
       currentX = diff;
       if (currentX < 0) currentX = 0;
       if (currentX > 120) currentX = 120 + (currentX - 120) * 0.2;
+
+      // Prevent browser horizontal scrolling/gestures if we are swiping
+      if (currentX > 5) {
+        e.preventDefault();
+      }
+
       content.style.transform = `translateX(${currentX}px)`;
     },
-    { passive: true }
+    { passive: false }
   );
   content.addEventListener('touchend', () => {
     isSwiping = false;

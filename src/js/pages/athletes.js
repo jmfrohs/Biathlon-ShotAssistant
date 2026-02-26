@@ -300,7 +300,7 @@ class AthletesPage {
         content.style.transition = 'none';
         isSwiping = true;
       },
-      { passive: true }
+      { passive: false }
     );
     content.addEventListener(
       'touchmove',
@@ -309,9 +309,15 @@ class AthletesPage {
         currentX = e.touches[0].clientX - startX;
         if (currentX < 0) currentX = 0;
         if (currentX > 120) currentX = 120 + (currentX - 120) * 0.2;
+
+        // Prevent browser horizontal scrolling/gestures if we are swiping
+        if (currentX > 5) {
+          e.preventDefault();
+        }
+
         content.style.transform = `translateX(${currentX}px)`;
       },
-      { passive: true }
+      { passive: false }
     );
     content.addEventListener('touchend', () => {
       isSwiping = false;

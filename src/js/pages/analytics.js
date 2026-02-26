@@ -42,6 +42,7 @@ class AnalyticsPage {
     this.currentAthlete = null;
     this.currentSession = null;
     this.currentView = 'selection';
+    this.currentAthleteSessionFilter = 'all';
     this.currentShots = [];
     this.currentSeriesList = [];
     this.init();
@@ -409,13 +410,31 @@ class AnalyticsPage {
 
     this.container.innerHTML = `
       <div class="px-1 pb-2 space-y-3">
-        <div class="flex justify-between items-end">
-          <h2 class="text-sm font-bold text-light-blue-info uppercase tracking-widest">${t('series')}</h2>
-          <span class="text-[10px] text-light-blue-info/50 font-bold">${sessionSeries.length} ${t('series')}</span>
+        <div class="flex justify-between items-center bg-card-dark/50 p-3 rounded-2xl border border-subtle/20">
+          <div class="flex flex-col">
+            <h2 class="text-sm font-bold text-light-blue-info uppercase tracking-widest">${t('series')}</h2>
+            <span class="text-[10px] text-light-blue-info/50 font-bold">${sessionSeries.length} ${t('series')}</span>
+          </div>
+          <div class="flex gap-2">
+            <button id="session-export-pdf" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-xl text-xs font-bold border border-primary/20 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                ${t('export_pdf') || 'PDF'}
+            </button>
+            <button id="session-export-excel" class="flex items-center gap-1.5 px-3 py-1.5 bg-neon-green/10 text-neon-green rounded-xl text-xs font-bold border border-neon-green/20 active:scale-95 transition-all">
+                <span class="material-symbols-outlined text-sm">description</span>
+                ${t('export_excel') || 'Excel'}
+            </button>
+          </div>
         </div>
       </div>
       <div id="analytics-series-list" class="space-y-3 pb-20"></div>
     `;
+
+    const pdfBtn = document.getElementById('session-export-pdf');
+    const excelBtn = document.getElementById('session-export-excel');
+    if (pdfBtn) pdfBtn.onclick = () => this.exportSessionToPDF_Analytics(session, sessionSeries);
+    if (excelBtn)
+      excelBtn.onclick = () => this.exportSessionToExcel_Analytics(session, sessionSeries);
 
     const list = document.getElementById('analytics-series-list');
     if (sessionSeries.length === 0) {
@@ -573,6 +592,7 @@ class AnalyticsPage {
   selectAthlete(athlete) {
     this.currentAthlete = athlete;
     this.currentView = 'athlete_detail';
+    this.currentAthleteSessionFilter = 'all'; // Reset session filter
     if (this.title) this.title.textContent = athlete.name;
     if (this.backBtn) this.backBtn.classList.remove('hidden');
     this.renderSeriesList();
@@ -581,22 +601,41 @@ class AnalyticsPage {
   renderSeriesList() {
     if (!this.currentAthlete) return;
     let athleteSeries = [];
+    const athleteSessions = [];
+    const seenSessions = new Set();
+
     this.sessions.forEach((session) => {
+      let athleteJoinedSession = false;
       if (session.series) {
         session.series.forEach((s) => {
           if (s.athleteId === this.currentAthlete.id) {
+            athleteJoinedSession = true;
             athleteSeries.push({
               ...s,
               sessionDate: session.date,
               sessionLocation: session.location,
               sessionId: session.id,
               sessionType: session.type,
+              sessionName: session.name,
             });
           }
         });
       }
+
+      if (athleteJoinedSession && !seenSessions.has(session.id)) {
+        athleteSessions.push(session);
+        seenSessions.add(session.id);
+      }
     });
+
     const totalSeriesCount = athleteSeries.length;
+
+    // Apply Session Filter
+    if (this.currentAthleteSessionFilter !== 'all') {
+      athleteSeries = athleteSeries.filter((s) => s.sessionId === this.currentAthleteSessionFilter);
+    }
+
+    // Apply Type Filter
     if (this.currentSeriesFilter !== 'all') {
       if (this.currentSeriesFilter === 'competition') {
         athleteSeries = athleteSeries.filter((s) => s.sessionType === 'competition');
@@ -608,18 +647,80 @@ class AnalyticsPage {
         athleteSeries = athleteSeries.filter((s) => s.type !== 'zeroing');
       }
     }
+
     athleteSeries.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
     this.container.innerHTML = `
             <div class="px-1 pb-2 space-y-3">
-                <div class="flex justify-between items-end">
-                    <h2 class="text-sm font-bold text-light-blue-info uppercase tracking-widest">${t('history')}</h2>
-                    <span class="text-[10px] text-light-blue-info/50 font-bold">${athleteSeries.length} / ${totalSeriesCount} ${t('series')}</span>
+                <div class="flex justify-between items-center bg-card-dark/50 p-3 rounded-2xl border border-subtle/20">
+                    <div class="flex flex-col">
+                        <h2 class="text-sm font-bold text-light-blue-info uppercase tracking-widest">${t('history')}</h2>
+                        <span class="text-[10px] text-light-blue-info/50 font-bold">${athleteSeries.length} / ${totalSeriesCount} ${t('series')}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button id="athlete-export-pdf" class="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-xl text-xs font-bold border border-primary/20 active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                            ${t('export_pdf') || 'PDF'}
+                        </button>
+                        <button id="athlete-export-excel" class="flex items-center gap-1.5 px-3 py-1.5 bg-neon-green/10 text-neon-green rounded-xl text-xs font-bold border border-neon-green/20 active:scale-95 transition-all">
+                            <span class="material-symbols-outlined text-sm">description</span>
+                            ${t('export_excel') || 'Excel'}
+                        </button>
+                    </div>
                 </div>
+
+                <!-- Session Units Filter -->
+                <div class="space-y-1.5 pt-1">
+                  <p class="text-[10px] font-bold text-light-blue-info/50 uppercase tracking-widest px-1">${t('training_units') || 'Einheiten'}</p>
+                  <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar -mx-1 px-1">
+                    <button data-session-filter="all"
+                        class="athlete-session-filter-btn px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all ${
+                          this.currentAthleteSessionFilter === 'all'
+                            ? 'bg-primary text-off-white font-bold'
+                            : 'bg-card-dark text-off-white/60 font-semibold border border-subtle'
+                        }">
+                        ${t('filter_all') || 'Alle'}
+                    </button>
+                    ${athleteSessions
+                      .sort((a, b) => new Date(b.date) - new Date(a.date))
+                      .map((session) => {
+                        const isActive = this.currentAthleteSessionFilter === session.id;
+                        const dateStr = new Date(session.date).toLocaleDateString([], {
+                          month: 'short',
+                          day: 'numeric',
+                        });
+                        return `
+                        <button data-session-filter="${session.id}"
+                            class="athlete-session-filter-btn px-4 py-2 rounded-xl text-xs whitespace-nowrap transition-all ${
+                              isActive
+                                ? 'bg-primary text-off-white font-bold'
+                                : 'bg-card-dark text-off-white/60 font-semibold border border-subtle'
+                            }">
+                            <div class="flex flex-col items-start leading-tight">
+                              <span>${this.escapeHtml(session.name)}</span>
+                              <span class="text-[8px] opacity-60">${dateStr}</span>
+                            </div>
+                        </button>
+                      `;
+                      })
+                      .join('')}
+                  </div>
+                </div>
+
                 ${this.renderSeriesFilters(athleteSeries, totalSeriesCount)}
             </div>
             <div id="analytics-series-list" class="space-y-3 pb-20"></div>
         `;
+
+    const pdfBtn = document.getElementById('athlete-export-pdf');
+    const excelBtn = document.getElementById('athlete-export-excel');
+    if (pdfBtn) pdfBtn.onclick = () => this.exportAthleteToPDF(this.currentAthlete, athleteSeries);
+    if (excelBtn)
+      excelBtn.onclick = () => this.exportAthleteToExcel(this.currentAthlete, athleteSeries);
+
     this.attachSeriesFilterListeners();
+    this.attachAthleteSessionFilterListeners();
+
     const list = document.getElementById('analytics-series-list');
     if (athleteSeries.length === 0) {
       list.innerHTML = `
@@ -1183,6 +1284,275 @@ class AnalyticsPage {
     });
     svg += `</svg>`;
     return svg;
+  }
+
+  exportAthleteToPDF(athlete, series) {
+    if (!window.jspdf) {
+      alert('PDF library not loaded');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+
+    // Title
+    doc.setFontSize(22);
+    doc.text(t('analytics') || 'Analytics', 14, 20);
+
+    doc.setFontSize(16);
+    doc.setTextColor(100);
+    doc.text(athlete.name, 14, 30);
+
+    // Stats
+    const totalShots = series.reduce((sum, s) => sum + (s.shots ? s.shots.length : 0), 0);
+    const hitCount = series.reduce(
+      (sum, s) => sum + (s.shots ? s.shots.filter((sh) => sh.hit).length : 0),
+      0
+    );
+    const hitRate = totalShots > 0 ? `${Math.round((hitCount / totalShots) * 100)}%` : '-';
+
+    doc.setFontSize(10);
+    doc.setTextColor(50);
+    doc.text(`${t('hit_rate')}: ${hitRate} (${hitCount}/${totalShots})`, 14, 40);
+    doc.text(`${t('history')}: ${series.length} ${t('series')}`, 14, 45);
+
+    // Table
+    const head = [
+      [
+        t('session_date') || 'Datum',
+        t('location') || 'Ort',
+        t('stance') || 'Anschlag',
+        t('hits') || 'Treffer',
+        t('total_time') || 'Zeit',
+      ],
+    ];
+
+    const body = series.map((s) => {
+      const sHits = s.shots ? s.shots.filter((sh) => sh.hit).length : 0;
+      const sTotal = s.shots ? s.shots.length : 0;
+      const dateStr = new Date(s.timestamp).toLocaleDateString([], {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+      return [
+        dateStr,
+        s.sessionLocation || '-',
+        s.type === 'zeroing' ? t('zeroing') : s.stance === 'prone' ? t('prone') : t('standing'),
+        `${sHits}/${sTotal}`,
+        s.totalTime || '-',
+      ];
+    });
+
+    if (doc.autoTable) {
+      doc.autoTable({
+        head,
+        body,
+        startY: 55,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 122, 255] },
+      });
+    }
+
+    doc.save(`Analytics_${athlete.name.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+  }
+
+  exportAthleteToExcel(athlete, series) {
+    if (typeof XLSX === 'undefined') {
+      alert('Excel library not loaded');
+      return;
+    }
+
+    const data = series.map((s) => {
+      const sHits = s.shots ? s.shots.filter((sh) => sh.hit).length : 0;
+      const sTotal = s.shots ? s.shots.length : 0;
+      const hitRate = sTotal > 0 ? Math.round((sHits / sTotal) * 100) : 0;
+
+      return {
+        [t('session_date') || 'Datum']: new Date(s.timestamp).toLocaleDateString(),
+        [t('location') || 'Ort']: s.sessionLocation || '-',
+        [t('stance') || 'Anschlag']: s.type === 'zeroing' ? t('zeroing') : s.stance,
+        [t('hits') || 'Treffer']: sHits,
+        [t('total') || 'Gesamt']: sTotal,
+        [t('hit_rate') || 'Quote (%)']: hitRate,
+        [t('total_time') || 'Zeit']: s.totalTime || '-',
+      };
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Analytics');
+
+    // Dynamic widths
+    const wscols = [
+      { wch: 15 }, // Date
+      { wch: 20 }, // Location
+      { wch: 15 }, // Stance
+      { wch: 10 }, // Hits
+      { wch: 10 }, // Total
+      { wch: 10 }, // Rate
+      { wch: 12 }, // Time
+    ];
+    worksheet['!cols'] = wscols;
+
+    XLSX.writeFile(workbook, `Analytics_${athlete.name.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
+  }
+
+  exportSessionToPDF_Analytics(session, series) {
+    if (!window.jspdf) {
+      alert('PDF library not loaded');
+      return;
+    }
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(22);
+    doc.text(session.name, 14, 20);
+
+    doc.setFontSize(12);
+    doc.setTextColor(100);
+    doc.text(`${session.location || '-'} | ${new Date(session.date).toLocaleDateString()}`, 14, 28);
+
+    // Re-use logic for SF 1...n columns
+    // Collect all athletes in this session view
+    const uniqueAthleteIds = [...new Set(series.map((s) => s.athleteId))];
+    const sessionAthletes = uniqueAthleteIds.map((id) => {
+      const athlete = this.athletes.find((a) => a.id == id);
+      return athlete || { id, name: t('unknown_athlete') };
+    });
+
+    let maxSeriesCount = 0;
+    sessionAthletes.forEach((athlete) => {
+      const count = series.filter((s) => s.athleteId == athlete.id).length;
+      if (count > maxSeriesCount) maxSeriesCount = count;
+    });
+
+    const seriesCols = Array.from({ length: maxSeriesCount }, (_, i) => `SF ${i + 1}`);
+
+    const head = [[t('name') || 'Name', t('hits') || 'Treffer', ...seriesCols]];
+
+    const body = sessionAthletes.map((athlete) => {
+      const atomSeries = series
+        .filter((s) => s.athleteId == athlete.id)
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      const hitCount = atomSeries.reduce(
+        (sum, s) =>
+          sum + (s.stats?.hitCount || (s.shots ? s.shots.filter((sh) => sh.hit).length : 0)),
+        0
+      );
+      const totalShots = atomSeries.reduce(
+        (sum, s) => sum + (s.stats?.totalShots || (s.shots ? s.shots.length : 0)),
+        0
+      );
+      const hitRate = totalShots > 0 ? `${Math.round((hitCount / totalShots) * 100)}%` : '-';
+
+      const seriesData = Array.from({ length: maxSeriesCount }, (_, i) => {
+        const s = atomSeries[i];
+        if (!s) return '-';
+        const sHits = s.shots ? s.shots.filter((sh) => sh.hit).length : s.stats?.hitCount || 0;
+        const sTotal = s.shots ? s.shots.length : s.stats?.totalShots || 0;
+        return `${s.rangeTime || s.totalTime || '-'} (${sHits}/${sTotal})`;
+      });
+
+      return [athlete.name, `${hitCount}/${totalShots} (${hitRate})`, ...seriesData];
+    });
+
+    if (doc.autoTable) {
+      doc.autoTable({
+        head,
+        body,
+        startY: 35,
+        theme: 'grid',
+        headStyles: { fillColor: [0, 122, 255] },
+      });
+    }
+
+    doc.save(`Session_${session.name.replace(/[^a-z0-9]/gi, '_')}.pdf`);
+  }
+
+  exportSessionToExcel_Analytics(session, series) {
+    if (typeof XLSX === 'undefined') {
+      alert('Excel library not loaded');
+      return;
+    }
+
+    const uniqueAthleteIds = [...new Set(series.map((s) => s.athleteId))];
+    const sessionAthletes = uniqueAthleteIds.map((id) => {
+      const athlete = this.athletes.find((a) => a.id == id);
+      return athlete || { id, name: t('unknown_athlete') };
+    });
+
+    let maxSeriesCount = 0;
+    sessionAthletes.forEach((athlete) => {
+      const count = series.filter((s) => s.athleteId == athlete.id).length;
+      if (count > maxSeriesCount) maxSeriesCount = count;
+    });
+
+    const data = sessionAthletes.map((athlete) => {
+      const atomSeries = series
+        .filter((s) => s.athleteId == athlete.id)
+        .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      const hitCount = atomSeries.reduce(
+        (sum, s) =>
+          sum + (s.stats?.hitCount || (s.shots ? s.shots.filter((sh) => sh.hit).length : 0)),
+        0
+      );
+      const totalShots = atomSeries.reduce(
+        (sum, s) => sum + (s.stats?.totalShots || (s.shots ? s.shots.length : 0)),
+        0
+      );
+      const hitRate = totalShots > 0 ? Math.round((hitCount / totalShots) * 100) : 0;
+
+      const row = {
+        [t('name') || 'Name']: athlete.name,
+        [t('hits') || 'Treffer']: hitCount,
+        [t('total') || 'Gesamt']: totalShots,
+        [t('hit_rate') || 'Quote (%)']: hitRate,
+      };
+
+      for (let i = 0; i < maxSeriesCount; i++) {
+        const s = atomSeries[i];
+        const sHits = s?.shots ? s.shots.filter((sh) => sh.hit).length : s?.stats?.hitCount || 0;
+        const sTotal = s?.shots ? s.shots.length : s?.stats?.totalShots || 0;
+        row[`SF ${i + 1} Zeit`] = s?.rangeTime || s?.totalTime || '-';
+        row[`SF ${i + 1} Treffer`] = s ? `${sHits}/${sTotal}` : '-';
+      }
+
+      return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Session');
+
+    const wscols = [
+      { wch: 25 }, // Name
+      { wch: 10 }, // Hits
+      { wch: 10 }, // Total
+      { wch: 10 }, // Rate
+    ];
+    for (let i = 0; i < maxSeriesCount; i++) {
+      wscols.push({ wch: 12 });
+      wscols.push({ wch: 10 });
+    }
+    worksheet['!cols'] = wscols;
+
+    XLSX.writeFile(workbook, `Session_${session.name.replace(/[^a-z0-9]/gi, '_')}.xlsx`);
+  }
+
+  attachAthleteSessionFilterListeners() {
+    const btns = this.container.querySelectorAll('.athlete-session-filter-btn');
+    btns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.sessionFilter;
+        this.currentAthleteSessionFilter = filter === 'all' ? 'all' : filter;
+        this.renderSeriesList();
+      });
+    });
   }
 
   escapeHtml(text) {

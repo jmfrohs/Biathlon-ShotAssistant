@@ -43,13 +43,26 @@ SOFTWARE.
   --color-primary-faded: rgba(0, 122, 255, 0.2);
 }
 
+html,
+body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   -webkit-tap-highlight-color: transparent;
   background-color: var(--color-bg);
   color: var(--color-text);
-  min-height: max(884px, 100dvh);
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ios-blur {

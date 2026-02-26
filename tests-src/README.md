@@ -10,21 +10,25 @@ This directory contains Jest test suites for the new refactored source code in t
 ## Running Tests
 
 ### Run all tests (both old and new)
+
 ```bash
 npm run test
 ```
 
 ### Run only new src tests
+
 ```bash
 npm run tests
 ```
 
 ### Run only old src-old tests
+
 ```bash
 npm run tests-old
 ```
 
 ### Run tests with coverage
+
 ```bash
 npm run test:coverage
 ```

@@ -22,43 +22,66 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 -->
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="de">
-
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Schießstandhelferein</title>
     <!-- CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-    
+    <link rel="stylesheet" href="css/styles.css" />
+
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
   </head>
 
   <body class="p-8">
-
     <!-- Übersicht Einheiten -->
     <div id="view-sessions" class="max-w-5xl mx-auto page-transition min-h-screen">
       <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <div>
-          <h1 class="text-4xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+          <h1
+            class="text-4xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
+          >
             <span id="trainer-name-display"></span>'s Schießstandhelferlein :)
           </h1>
           <p class="text-slate-400 mt-1">Fränki pass auf dein Herz auf ;)</p>
         </div>
         <div class="flex gap-2 md:gap-3 flex-wrap md:flex-nowrap">
-          <button onclick="openHistoryViewer()" class="p-3 bg-slate-800/50 hover:bg-indigo-600/20 rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/50 backdrop-blur" title="Alle Athleten & Serien">📊</button>
-          <select id="history-filter-type" onchange="filterHistoryByType()" class="bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-3 text-slate-200 text-sm outline-none focus:border-indigo-500 hover:bg-slate-700/50 transition-all backdrop-blur">
+          <button
+            onclick="openHistoryViewer()"
+            class="p-3 bg-slate-800/50 hover:bg-indigo-600/20 rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/50 backdrop-blur"
+            title="Alle Athleten & Serien"
+          >
+            📊
+          </button>
+          <select
+            id="history-filter-type"
+            onchange="filterHistoryByType()"
+            class="bg-slate-800/50 border border-slate-700/50 rounded-xl px-3 py-3 text-slate-200 text-sm outline-none focus:border-indigo-500 hover:bg-slate-700/50 transition-all backdrop-blur"
+          >
             <option value="">Alle Typen</option>
             <option value="Training">Training</option>
             <option value="Wettkampf">Wettkampf</option>
             <option value="Anschießen">Anschießen</option>
           </select>
-          <button onclick="openSettings()" class="p-3 bg-slate-800/50 hover:bg-indigo-600/20 rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/50 backdrop-blur">⚙️</button>
-          <button onclick="openSessionModal()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/30 transition-all hover:shadow-indigo-500/50 backdrop-blur">Neue Einheit</button>
+          <button
+            onclick="openSettings()"
+            class="p-3 bg-slate-800/50 hover:bg-indigo-600/20 rounded-xl transition-all border border-slate-700/50 hover:border-indigo-500/50 backdrop-blur"
+          >
+            ⚙️
+          </button>
+          <button
+            onclick="openSessionModal()"
+            class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-500/30 transition-all hover:shadow-indigo-500/50 backdrop-blur"
+          >
+            Neue Einheit
+          </button>
         </div>
       </div>
       <div class="grid gap-4" id="session-list"></div>
@@ -67,16 +90,35 @@ SOFTWARE.
     <!-- Übersicht Athleten -->
     <div id="view-athletes" class="max-w-5xl mx-auto hidden page-transition min-h-screen">
       <div class="flex items-center gap-4 mb-8">
-        <button onclick="showSessionsView()" class="p-2 hover:bg-slate-800 rounded-full transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        <button
+          onclick="showSessionsView()"
+          class="p-2 hover:bg-slate-800 rounded-full transition-all"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-indigo-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <div class="flex-1">
           <h1 id="view-athletes-title" class="text-3xl font-bold"></h1>
           <p id="view-athletes-subtitle" class="text-slate-400"></p>
         </div>
-        <button onclick="openSessionSettings()" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-slate-700">⚙️</button>
+        <button
+          onclick="openSessionSettings()"
+          class="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-slate-700"
+        >
+          ⚙️
+        </button>
       </div>
 
       <div class="grid gap-4" id="athletes-in-session-list"></div>
@@ -85,9 +127,23 @@ SOFTWARE.
     <!-- Übersicht Serien einzelner Athleten -->
     <div id="view-athlete-detail" class="max-w-5xl mx-auto hidden page-transition min-h-screen">
       <div class="flex items-center gap-4 mb-8">
-        <button onclick="backToAthletes()" class="p-2 hover:bg-slate-800 rounded-full transition-all">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        <button
+          onclick="backToAthletes()"
+          class="p-2 hover:bg-slate-800 rounded-full transition-all"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-8 w-8 text-indigo-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
         </button>
         <div class="flex-1">
@@ -95,8 +151,17 @@ SOFTWARE.
           <p id="athlete-detail-subtitle" class="text-slate-400"></p>
         </div>
         <div class="flex gap-3">
-          <button onclick="deleteAllSeriesForAthlete()" class="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-red-600 text-red-400 hover:text-red-300" title="Alle Serien dieses Athleten löschen">🗑️</button>
-          <button onclick="openShootingInterface()" class="bg-indigo-600 hover:bg-indigo-700 px-6 py-3 rounded-xl font-bold shadow-lg transition-all">
+          <button
+            onclick="deleteAllSeriesForAthlete()"
+            class="p-3 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all border border-red-600 text-red-400 hover:text-red-300"
+            title="Alle Serien dieses Athleten löschen"
+          >
+            🗑️
+          </button>
+          <button
+            onclick="openShootingInterface()"
+            class="bg-indigo-600 hover:bg-indigo-700 px-6 py-3 rounded-xl font-bold shadow-lg transition-all"
+          >
             Neue Serie
           </button>
         </div>
@@ -105,98 +170,251 @@ SOFTWARE.
       <div class="mb-6">
         <h2 class="text-xl font-bold mb-4">Schieß-Statistik</h2>
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-purple-500/20">
-            <div class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent" id="stat-total-series">0</div>
+          <div
+            class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-purple-500/20"
+          >
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+              id="stat-total-series"
+            >
+              0
+            </div>
             <div class="text-xs text-slate-400 mt-2 font-medium">Anzahl Serien</div>
           </div>
-          <div class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-green-500/20">
-            <div class="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent" id="stat-hit-rate">0%</div>
+          <div
+            class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-green-500/20"
+          >
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent"
+              id="stat-hit-rate"
+            >
+              0%
+            </div>
             <div class="text-xs text-slate-400 mt-2 font-medium">Trefferquote</div>
           </div>
-          <div class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-yellow-500/20">
-            <div class="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent" id="stat-avg-score">0</div>
+          <div
+            class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-yellow-500/20"
+          >
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent"
+              id="stat-avg-score"
+            >
+              0
+            </div>
             <div class="text-xs text-slate-400 mt-2 font-medium">Ø Ringe</div>
           </div>
-          <div class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-pink-500/20">
-            <div class="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent" id="stat-best-score">0</div>
+          <div
+            class="glass-card p-6 rounded-xl text-center hover:shadow-lg hover:shadow-pink-500/20"
+          >
+            <div
+              class="text-3xl font-bold bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent"
+              id="stat-best-score"
+            >
+              0
+            </div>
             <div class="text-xs text-slate-400 mt-2 font-medium">Gesamte Schüsse</div>
           </div>
         </div>
       </div>
 
-      <h2 class="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Serien-Historie</h2>
-      
+      <h2
+        class="text-xl font-bold mb-4 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+      >
+        Serien-Historie
+      </h2>
+
       <div id="athlete-history-list" class="space-y-4">
         <p class="text-center text-slate-500 py-10">Keine Serien vorhanden.</p>
       </div>
     </div>
 
     <!-- Einheit erstellen -->
-    <div id="session-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="bg-slate-800/95 w-full max-w-xl rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 backdrop-blur-xl">
-        <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Trainingseinheit hinzufügen</h2>
+    <div
+      id="session-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800/95 w-full max-w-xl rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 backdrop-blur-xl"
+      >
+        <h2
+          class="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+        >
+          Trainingseinheit hinzufügen
+        </h2>
         <form id="session-form" class="space-y-5">
           <div class="grid grid-cols-2 gap-4">
-            <input type="text" id="s-ort" placeholder="Ort" required class="bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur">
-            <input type="date" id="s-datum" required class="bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur">
+            <input
+              type="text"
+              id="s-ort"
+              placeholder="Ort"
+              required
+              class="bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+            />
+            <input
+              type="date"
+              id="s-datum"
+              required
+              class="bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+            />
           </div>
-          <input type="text" id="s-zusatz" placeholder="Zusatz (z.B. DP Sprint)" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur">
+          <input
+            type="text"
+            id="s-zusatz"
+            placeholder="Zusatz (z.B. DP Sprint)"
+            class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-3 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+          />
 
           <div class="bg-slate-900/40 rounded-lg border border-slate-700/50 p-4 backdrop-blur">
             <div class="flex justify-between items-center mb-3">
               <label class="text-xs font-bold text-slate-400 uppercase">Athleten auswählen</label>
-              <button type="button" onclick="toggleAllAthletes()" id="toggle-all-btn" class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">Alle auswählen</button>
+              <button
+                type="button"
+                onclick="toggleAllAthletes()"
+                id="toggle-all-btn"
+                class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 transition-colors"
+              >
+                Alle auswählen
+              </button>
             </div>
-            <div id="athlete-checkboxes" class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto custom-scrollbar"></div>
+            <div
+              id="athlete-checkboxes"
+              class="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto custom-scrollbar"
+            ></div>
           </div>
 
           <div class="grid grid-cols-3 gap-2">
-            <button type="button" onclick="setSType('Training')" id="s-btn-t" class="p-3 rounded-lg border border-slate-700/50 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-indigo-600/20 transition-all backdrop-blur">Training</button>
-            <button type="button" onclick="setSType('Wettkampf')" id="s-btn-w" class="p-3 rounded-lg border border-slate-700/50 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-indigo-600/20 transition-all backdrop-blur">Wettkampf</button>
-            <button type="button" onclick="setSType('Anschießen')" id="s-btn-a" class="p-3 rounded-lg border border-slate-700/50 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-indigo-600/20 transition-all backdrop-blur">Anschießen</button>
+            <button
+              type="button"
+              onclick="setSType('Training')"
+              id="s-btn-t"
+              class="p-3 rounded-lg border border-slate-700/50 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-indigo-600/20 transition-all backdrop-blur"
+            >
+              Training
+            </button>
+            <button
+              type="button"
+              onclick="setSType('Wettkampf')"
+              id="s-btn-w"
+              class="p-3 rounded-lg border border-slate-700/50 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-indigo-600/20 transition-all backdrop-blur"
+            >
+              Wettkampf
+            </button>
+            <button
+              type="button"
+              onclick="setSType('Anschießen')"
+              id="s-btn-a"
+              class="p-3 rounded-lg border border-slate-700/50 bg-slate-900/50 hover:border-indigo-500/50 hover:bg-indigo-600/20 transition-all backdrop-blur"
+            >
+              Anschießen
+            </button>
           </div>
 
           <div class="flex gap-3 pt-4">
-            <button type="button" onclick="closeModal('session-modal')" class="flex-1 p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg font-bold transition-all backdrop-blur">Abbrechen</button>
-            <button type="button" onclick="submitSessionForm()" class="flex-1 p-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg font-bold transition-all">Speichern</button>
+            <button
+              type="button"
+              onclick="closeModal('session-modal')"
+              class="flex-1 p-3 bg-slate-700/50 hover:bg-slate-700 rounded-lg font-bold transition-all backdrop-blur"
+            >
+              Abbrechen
+            </button>
+            <button
+              type="button"
+              onclick="submitSessionForm()"
+              class="flex-1 p-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 rounded-lg font-bold transition-all"
+            >
+              Speichern
+            </button>
           </div>
         </form>
       </div>
     </div>
 
     <!-- Einstellungen -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="bg-slate-800/95 w-full max-w-md rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 max-h-[90vh] overflow-y-auto custom-scrollbar backdrop-blur-xl">
-        <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Einstellungen</h2>
+    <div
+      id="settings-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800/95 w-full max-w-md rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 max-h-[90vh] overflow-y-auto custom-scrollbar backdrop-blur-xl"
+      >
+        <h2
+          class="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+        >
+          Einstellungen
+        </h2>
 
         <!-- Athleten Auswahl -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <h3 class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Athleten</h3>
+          <h3
+            class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            Athleten
+          </h3>
           <div class="space-y-4">
             <div class="flex gap-2">
-              <input type="text" id="new-athlete-name" placeholder="Athlet hinzufügen" class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur">
-              <button onclick="addGlobalAthlete()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all">+</button>
+              <input
+                type="text"
+                id="new-athlete-name"
+                placeholder="Athlet hinzufügen"
+                class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+              />
+              <button
+                onclick="addGlobalAthlete()"
+                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all"
+              >
+                +
+              </button>
             </div>
-            <div id="global-athlete-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
+            <div
+              id="global-athlete-list"
+              class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2"
+            ></div>
           </div>
         </div>
 
         <!-- Email-Versand Sektion -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <h3 class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Email-Empfänger</h3>
+          <h3
+            class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            Email-Empfänger
+          </h3>
           <div class="space-y-4">
             <div class="flex gap-2">
-              <input type="email" id="new-email-input" placeholder="Email hinzufügen (z.B. trainer@verein.de)" class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all text-sm backdrop-blur">
-              <button onclick="addTrainerEmail()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all">+</button>
+              <input
+                type="email"
+                id="new-email-input"
+                placeholder="Email hinzufügen (z.B. trainer@verein.de)"
+                class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all text-sm backdrop-blur"
+              />
+              <button
+                onclick="addTrainerEmail()"
+                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all"
+              >
+                +
+              </button>
             </div>
-            <div id="email-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
+            <div
+              id="email-list"
+              class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2"
+            ></div>
 
-            <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 p-2 rounded transition-all">
-              <input type="checkbox" id="auto-send-checkbox" class="accent-indigo-500" onchange="saveEmailSettings()">
+            <label
+              class="flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 p-2 rounded transition-all"
+            >
+              <input
+                type="checkbox"
+                id="auto-send-checkbox"
+                class="accent-indigo-500"
+                onchange="saveEmailSettings()"
+              />
               <span class="text-sm text-slate-300">Serien automatisch nach Beendigung senden</span>
             </label>
 
-            <button onclick="sendTestEmail()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-semibold text-sm transition-all active:from-indigo-800 active:to-purple-800">
+            <button
+              onclick="sendTestEmail()"
+              class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-semibold text-sm transition-all active:from-indigo-800 active:to-purple-800"
+            >
               Test-Email senden
             </button>
           </div>
@@ -204,127 +422,276 @@ SOFTWARE.
 
         <!-- Geräte Typ -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <label for="device-type" class="block mb-2 text-sm font-medium text-slate-300">Gerätetyp</label>
-          <select id="device-type" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur text-slate-100" onchange="saveDeviceType()">
+          <label for="device-type" class="block mb-2 text-sm font-medium text-slate-300"
+            >Gerätetyp</label
+          >
+          <select
+            id="device-type"
+            class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur text-slate-100"
+            onchange="saveDeviceType()"
+          >
             <option value="auto">Automatisch erkennen</option>
             <option value="phone">Smartphone</option>
             <option value="tablet">Tablet</option>
             <option value="pc">Computer/PC</option>
           </select>
-          <p class="text-xs text-slate-400 mt-2">Wählen Sie Ihr Gerät aus, um die UI optimal anzupassen.</p>
+          <p class="text-xs text-slate-400 mt-2">
+            Wählen Sie Ihr Gerät aus, um die UI optimal anzupassen.
+          </p>
         </div>
 
         <!-- Scheiben Auswahl -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <label for="target-selection" class="block mb-2 text-sm font-medium text-slate-300">Schießscheibe</label>
-          <select id="target-selection" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur text-slate-100" onchange="saveTargetSelection()">
+          <label for="target-selection" class="block mb-2 text-sm font-medium text-slate-300"
+            >Schießscheibe</label
+          >
+          <select
+            id="target-selection"
+            class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur text-slate-100"
+            onchange="saveTargetSelection()"
+          >
             <option value="scheibe1">Scheibe 1</option>
             <option value="scheibe2">Scheibe 2</option>
           </select>
-          <p class="text-xs text-slate-400 mt-2">Wählen Sie die Schießscheibe aus, die Sie verwenden möchten.</p>
+          <p class="text-xs text-slate-400 mt-2">
+            Wählen Sie die Schießscheibe aus, die Sie verwenden möchten.
+          </p>
         </div>
 
         <!-- Name -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <label for="trainer-name" class="block mb-2 text-sm font-medium text-slate-300">Trainer Name</label>
-          <input type="text" id="trainer-name" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur">
+          <label for="trainer-name" class="block mb-2 text-sm font-medium text-slate-300"
+            >Trainer Name</label
+          >
+          <input
+            type="text"
+            id="trainer-name"
+            class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+          />
         </div>
 
         <!-- API Keys -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <h3 class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">EmailJS API Keys (Für euch Irelevant)</h3>
+          <h3
+            class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            EmailJS API Keys (Für euch Irelevant)
+          </h3>
           <div class="space-y-3">
             <div>
-              <label for="api-public-key" class="block text-sm font-medium text-slate-400 mb-1">Public Key</label>
-              <input type="text" id="api-public-key" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 text-sm outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur" placeholder="Public Key eingeben...">
+              <label for="api-public-key" class="block text-sm font-medium text-slate-400 mb-1"
+                >Public Key</label
+              >
+              <input
+                type="text"
+                id="api-public-key"
+                class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 text-sm outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+                placeholder="Public Key eingeben..."
+              />
             </div>
             <div>
-              <label for="api-service-id" class="block text-sm font-medium text-slate-400 mb-1">Service ID</label>
-              <input type="text" id="api-service-id" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 text-sm outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur" placeholder="Service ID eingeben...">
+              <label for="api-service-id" class="block text-sm font-medium text-slate-400 mb-1"
+                >Service ID</label
+              >
+              <input
+                type="text"
+                id="api-service-id"
+                class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 text-sm outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+                placeholder="Service ID eingeben..."
+              />
             </div>
             <div>
-              <label for="api-template-id" class="block text-sm font-medium text-slate-400 mb-1">Template ID</label>
-              <input type="text" id="api-template-id" class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 text-sm outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur" placeholder="Template ID eingeben...">
+              <label for="api-template-id" class="block text-sm font-medium text-slate-400 mb-1"
+                >Template ID</label
+              >
+              <input
+                type="text"
+                id="api-template-id"
+                class="w-full bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 text-sm outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all backdrop-blur"
+                placeholder="Template ID eingeben..."
+              />
             </div>
-            <button onclick="resetApiKeysToDefault()" class="w-full bg-slate-700/50 hover:bg-slate-600/50 px-3 py-2 rounded-lg font-semibold text-sm transition-all backdrop-blur">Auf Standard zurücksetzen</button>
+            <button
+              onclick="resetApiKeysToDefault()"
+              class="w-full bg-slate-700/50 hover:bg-slate-600/50 px-3 py-2 rounded-lg font-semibold text-sm transition-all backdrop-blur"
+            >
+              Auf Standard zurücksetzen
+            </button>
           </div>
         </div>
 
-        <button onclick="closeModal('settings-modal')" class="w-full p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg font-bold transition-all backdrop-blur">Schließen</button>
+        <button
+          onclick="closeModal('settings-modal')"
+          class="w-full p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg font-bold transition-all backdrop-blur"
+        >
+          Schließen
+        </button>
       </div>
     </div>
 
     <!-- Einheits-Einstellungen Modal -->
-    <div id="session-settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="bg-slate-800/95 w-full max-w-md rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 max-h-[90vh] overflow-y-auto custom-scrollbar backdrop-blur-xl">
-        <h2 class="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Einheits-Einstellungen</h2>
+    <div
+      id="session-settings-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800/95 w-full max-w-md rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 max-h-[90vh] overflow-y-auto custom-scrollbar backdrop-blur-xl"
+      >
+        <h2
+          class="text-2xl font-bold mb-6 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+        >
+          Einheits-Einstellungen
+        </h2>
 
         <!-- Athleten für diese Einheit -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <h3 class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Athleten in dieser Einheit</h3>
+          <h3
+            class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            Athleten in dieser Einheit
+          </h3>
           <div class="space-y-4">
             <div class="flex gap-2">
-              <select id="session-athlete-select" class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all text-sm backdrop-blur">
+              <select
+                id="session-athlete-select"
+                class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all text-sm backdrop-blur"
+              >
                 <option value="">-- Athlet auswählen --</option>
               </select>
-              <button onclick="addSessionAthlete()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all">+</button>
+              <button
+                onclick="addSessionAthlete()"
+                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all"
+              >
+                +
+              </button>
             </div>
-            <div class="space-y-2 max-h-32 overflow-y-auto custom-scrollbar" id="session-athletes-list"></div>
+            <div
+              class="space-y-2 max-h-32 overflow-y-auto custom-scrollbar"
+              id="session-athletes-list"
+            ></div>
           </div>
         </div>
 
         <!-- Email-Versand Toggle -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <h3 class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Email-Versand</h3>
-          <label class="flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 p-2 rounded transition-all">
-            <input type="checkbox" id="session-auto-send-checkbox" class="accent-indigo-500" onchange="saveSessionEmailSettings()">
+          <h3
+            class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            Email-Versand
+          </h3>
+          <label
+            class="flex items-center gap-2 cursor-pointer hover:bg-slate-700/50 p-2 rounded transition-all"
+          >
+            <input
+              type="checkbox"
+              id="session-auto-send-checkbox"
+              class="accent-indigo-500"
+              onchange="saveSessionEmailSettings()"
+            />
             <span class="text-sm text-slate-300">Serien automatisch nach Beendigung versenden</span>
           </label>
         </div>
 
         <!-- Email-Empfänger für diese Einheit -->
         <div class="mb-6 pb-6 border-b border-slate-700/50">
-          <h3 class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Email-Empfänger</h3>
+          <h3
+            class="text-lg font-bold mb-3 bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent"
+          >
+            Email-Empfänger
+          </h3>
           <div class="space-y-4">
             <div class="flex gap-2">
-              <input type="email" id="session-email-input" placeholder="Email hinzufügen" class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all text-sm backdrop-blur">
-              <button onclick="addSessionEmail()" class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all">+</button>
+              <input
+                type="email"
+                id="session-email-input"
+                placeholder="Email hinzufügen"
+                class="flex-1 bg-slate-900/50 border border-slate-700/50 rounded-lg p-2 outline-none focus:border-indigo-500 focus:bg-slate-900 transition-all text-sm backdrop-blur"
+              />
+              <button
+                onclick="addSessionEmail()"
+                class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 px-4 py-2 rounded-lg font-bold transition-all"
+              >
+                +
+              </button>
             </div>
-            <div id="session-email-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2"></div>
+            <div
+              id="session-email-list"
+              class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-2"
+            ></div>
           </div>
         </div>
 
-        <button onclick="closeModal('session-settings-modal')" class="w-full p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg font-bold transition-all backdrop-blur">Schließen</button>
+        <button
+          onclick="closeModal('session-settings-modal')"
+          class="w-full p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg font-bold transition-all backdrop-blur"
+        >
+          Schließen
+        </button>
       </div>
     </div>
 
     <!-- Email-Auswahl Modal -->
-    <div id="email-selection-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="bg-slate-800/95 w-full max-w-md rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 backdrop-blur-xl">
+    <div
+      id="email-selection-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800/95 w-full max-w-md rounded-2xl p-6 border border-slate-700/50 shadow-2xl shadow-indigo-500/20 backdrop-blur-xl"
+      >
         <h2 class="text-xl font-bold mb-6 text-white">Email-Adresse auswählen</h2>
-        <div id="email-selection-list" class="space-y-2 mb-6 max-h-64 overflow-y-auto custom-scrollbar"></div>
+        <div
+          id="email-selection-list"
+          class="space-y-2 mb-6 max-h-64 overflow-y-auto custom-scrollbar"
+        ></div>
         <div class="flex gap-3">
-          <button onclick="closeModal('email-selection-modal')" class="flex-1 p-3 bg-slate-700 rounded-lg font-bold">Abbrechen</button>
+          <button
+            onclick="closeModal('email-selection-modal')"
+            class="flex-1 p-3 bg-slate-700 rounded-lg font-bold"
+          >
+            Abbrechen
+          </button>
         </div>
       </div>
     </div>
 
     <!-- Scheibe Großansicht Modal -->
-    <div id="target-fullscreen-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-[9999]">
+    <div
+      id="target-fullscreen-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-[9999]"
+    >
       <div class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-xl font-bold text-white">Schießscheibe</h2>
-          <button onclick="closeModal('target-fullscreen-modal')" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+          <button
+            onclick="closeModal('target-fullscreen-modal')"
+            class="text-gray-400 hover:text-white text-3xl font-bold leading-none"
+          >
+            &times;
+          </button>
         </div>
-        <div id="fullscreen-target-container" class="rounded-full border-4 border-gray-700 max-w-lg mx-auto" style="aspect-ratio: 1 / 1;"></div>
+        <div
+          id="fullscreen-target-container"
+          class="rounded-full border-4 border-gray-700 max-w-lg mx-auto"
+          style="aspect-ratio: 1 / 1"
+        ></div>
       </div>
     </div>
 
     <!-- Serien hinzufügen -->
-    <div id="shooting-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto">
+    <div
+      id="shooting-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="w-full max-w-2xl bg-gray-800 rounded-xl shadow-2xl p-6 md:p-8 max-h-[90vh] overflow-y-auto"
+      >
         <div class="flex justify-end items-center mb-4">
-          <button onclick="closeShootingInterface()" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+          <button
+            onclick="closeShootingInterface()"
+            class="text-gray-400 hover:text-white text-3xl font-bold leading-none"
+          >
+            &times;
+          </button>
         </div>
 
         <p id="shot-counter" class="text-lg font-semibold text-indigo-400 text-center mb-4">
@@ -332,12 +699,31 @@ SOFTWARE.
         </p>
 
         <div class="grid grid-cols-2 gap-2 mb-6">
-          <button type="button" onclick="setPosition('Liegend')" id="pos-btn-prone" class="p-3 rounded-lg border-2 border-indigo-500 bg-indigo-500/20 font-bold text-white">Liegend</button>
-          <button type="button" onclick="setPosition('Stehend')" id="pos-btn-standing" class="p-3 rounded-lg border border-slate-700 bg-slate-900 text-slate-400">Stehend</button>
+          <button
+            type="button"
+            onclick="setPosition('Liegend')"
+            id="pos-btn-prone"
+            class="p-3 rounded-lg border-2 border-indigo-500 bg-indigo-500/20 font-bold text-white"
+          >
+            Liegend
+          </button>
+          <button
+            type="button"
+            onclick="setPosition('Stehend')"
+            id="pos-btn-standing"
+            class="p-3 rounded-lg border border-slate-700 bg-slate-900 text-slate-400"
+          >
+            Stehend
+          </button>
         </div>
 
         <div id="target-container">
-          <svg id="biathlon-target" viewBox="0 0 200 200" class="w-full h-full" style="background-color: #f3f4f6; border-radius: 50%;">
+          <svg
+            id="biathlon-target"
+            viewBox="0 0 200 200"
+            class="w-full h-full"
+            style="background-color: #f3f4f6; border-radius: 50%"
+          >
             <style>
               .ring-number-white {
                 font-size: 4px;
@@ -416,37 +802,79 @@ SOFTWARE.
 
         <!-- Arrow Buttons for Correction Adjustment -->
         <div class="flex justify-center gap-2 mt-4 mb-4 items-center">
-          <button onclick="window.adjustCorrectionUp()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold" title="Korrektur nach oben">▲</button>
-          <button onclick="window.adjustCorrectionDown()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold" title="Korrektur nach unten">▼</button>
-          <button onclick="window.adjustCorrectionLeft()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold" title="Korrektur nach links">◄</button>
-          <button onclick="window.adjustCorrectionRight()" class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold" title="Korrektur nach rechts">►</button>
+          <button
+            onclick="window.adjustCorrectionUp()"
+            class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold"
+            title="Korrektur nach oben"
+          >
+            ▲
+          </button>
+          <button
+            onclick="window.adjustCorrectionDown()"
+            class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold"
+            title="Korrektur nach unten"
+          >
+            ▼
+          </button>
+          <button
+            onclick="window.adjustCorrectionLeft()"
+            class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold"
+            title="Korrektur nach links"
+          >
+            ◄
+          </button>
+          <button
+            onclick="window.adjustCorrectionRight()"
+            class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded transition duration-200 text-lg font-bold"
+            title="Korrektur nach rechts"
+          >
+            ►
+          </button>
 
           <div class="flex flex-col items-center ml-4">
-            <label for="adjustment-toggle" class="text-sm font-semibold text-gray-400 mb-1 whitespace-nowrap">Pfeile</label>
+            <label
+              for="adjustment-toggle"
+              class="text-sm font-semibold text-gray-400 mb-1 whitespace-nowrap"
+              >Pfeile</label
+            >
             <label class="switch">
-              <input type="checkbox" id="adjustment-toggle" onchange="window.toggleAdjustment()">
+              <input type="checkbox" id="adjustment-toggle" onchange="window.toggleAdjustment()" />
               <span class="slider"></span>
             </label>
           </div>
         </div>
 
         <div class="mt-8 flex justify-center space-x-4 items-center flex-wrap gap-3">
-          <button id="toggle-button" class="flex items-center space-x-2 py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105" onclick="toggleSpeech()">
+          <button
+            id="toggle-button"
+            class="flex items-center space-x-2 py-3 px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105"
+            onclick="toggleSpeech()"
+          >
             <span id="button-text">Start Aufnahme</span>
           </button>
 
-          <button onclick="window.finishSeries()" class="py-3 px-6 border border-gray-600 text-gray-400 font-semibold rounded-full shadow-lg transition duration-300 hover:bg-gray-700 hover:text-white transform hover:scale-105">
+          <button
+            onclick="window.finishSeries()"
+            class="py-3 px-6 border border-gray-600 text-gray-400 font-semibold rounded-full shadow-lg transition duration-300 hover:bg-gray-700 hover:text-white transform hover:scale-105"
+          >
             Neue Serie
           </button>
 
-          <button onclick="window.undoLastShot()" class="py-3 px-6 border border-gray-600 text-gray-400 font-semibold rounded-full shadow-lg transition duration-300 hover:bg-gray-700 hover:text-white transform hover:scale-105">
+          <button
+            onclick="window.undoLastShot()"
+            class="py-3 px-6 border border-gray-600 text-gray-400 font-semibold rounded-full shadow-lg transition duration-300 hover:bg-gray-700 hover:text-white transform hover:scale-105"
+          >
             Zurück
           </button>
 
           <div class="flex flex-col items-center ml-4">
-            <label for="correction-toggle" class="text-sm font-semibold text-gray-400 mb-1 whitespace-nowrap">Korrektur</label>
+            <label
+              for="correction-toggle"
+              class="text-sm font-semibold text-gray-400 mb-1 whitespace-nowrap"
+              >Korrektur</label
+            >
             <label class="switch">
-              <input type="checkbox" id="correction-toggle" onchange="window.toggleCorrection()">
+              <input type="checkbox" id="correction-toggle" onchange="window.toggleCorrection()" />
               <span class="slider"></span>
             </label>
           </div>
@@ -455,26 +883,43 @@ SOFTWARE.
         <!-- Transcription Target - Collapsible at bottom -->
         <div class="mt-8 w-full">
           <div class="flex justify-center mb-2">
-            <button onclick="window.toggleTranscriptionView()" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition duration-200" id="transcription-toggle-btn">
+            <button
+              onclick="window.toggleTranscriptionView()"
+              class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded transition duration-200"
+              id="transcription-toggle-btn"
+            >
               Sprachausgabe anzeigen ▼
             </button>
           </div>
           <div id="transcription-container" class="hidden">
-            <div id="transcription-target" contenteditable="true" class="w-full border-2 border-gray-700 bg-gray-900 text-gray-200 p-4 rounded-lg focus:outline-none focus:border-indigo-500 transition duration-300 min-h-[40px] max-h-[200px] overflow-y-auto">
-            </div>
+            <div
+              id="transcription-target"
+              contenteditable="true"
+              class="w-full border-2 border-gray-700 bg-gray-900 text-gray-200 p-4 rounded-lg focus:outline-none focus:border-indigo-500 transition duration-300 min-h-[40px] max-h-[200px] overflow-y-auto"
+            ></div>
           </div>
         </div>
       </div>
     </div>
 
     <!-- Geschichte Viewer Modal - Athletenliste -->
-    <div id="history-viewer-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="bg-slate-800 w-full max-w-4xl rounded-2xl p-6 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div
+      id="history-viewer-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800 w-full max-w-4xl rounded-2xl p-6 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+      >
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-2xl font-bold text-white">Alle Athleten & Serien</h2>
-          <button onclick="closeModal('history-viewer-modal')" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+          <button
+            onclick="closeModal('history-viewer-modal')"
+            class="text-gray-400 hover:text-white text-3xl font-bold leading-none"
+          >
+            &times;
+          </button>
         </div>
-        
+
         <div id="history-athletes-list" class="grid gap-3">
           <p class="text-center text-slate-500 py-10">Keine Athleten vorhanden.</p>
         </div>
@@ -482,33 +927,70 @@ SOFTWARE.
     </div>
 
     <!-- Geschichte Viewer Modal - Serien Details -->
-    <div id="history-detail-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-      <div class="bg-slate-800 w-full max-w-4xl rounded-2xl p-6 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar">
+    <div
+      id="history-detail-modal"
+      class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800 w-full max-w-4xl rounded-2xl p-6 border border-slate-700 shadow-2xl max-h-[90vh] overflow-y-auto custom-scrollbar"
+      >
         <div class="flex items-center gap-4 mb-6">
-          <button onclick="backToHistoryAthletes()" class="p-2 hover:bg-slate-700 rounded-full transition-all">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          <button
+            onclick="backToHistoryAthletes()"
+            class="p-2 hover:bg-slate-700 rounded-full transition-all"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6 text-indigo-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M15 19l-7-7 7-7"
+              />
             </svg>
           </button>
           <div class="flex-1">
-            <h2 id="history-detail-athlete-name" class="text-2xl font-bold text-white">Athlet Name</h2>
+            <h2 id="history-detail-athlete-name" class="text-2xl font-bold text-white">
+              Athlet Name
+            </h2>
             <p id="history-detail-stats" class="text-slate-400 text-sm mt-1"></p>
           </div>
-          <button onclick="closeModal('history-detail-modal')" class="text-gray-400 hover:text-white text-3xl font-bold leading-none">&times;</button>
+          <button
+            onclick="closeModal('history-detail-modal')"
+            class="text-gray-400 hover:text-white text-3xl font-bold leading-none"
+          >
+            &times;
+          </button>
         </div>
 
         <!-- Suchbereich -->
         <div class="mb-6 p-4 bg-slate-900 rounded-lg border border-slate-700">
           <h3 class="text-sm font-bold text-slate-400 mb-3">Filter & Suche</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <input type="date" id="history-filter-date" placeholder="Nach Datum filtern" class="bg-slate-800 border border-slate-700 rounded-lg p-2 outline-none focus:border-indigo-500 text-sm">
-            <select id="history-filter-type" class="bg-slate-800 border border-slate-700 rounded-lg p-2 outline-none focus:border-indigo-500 text-sm">
+            <input
+              type="date"
+              id="history-filter-date"
+              placeholder="Nach Datum filtern"
+              class="bg-slate-800 border border-slate-700 rounded-lg p-2 outline-none focus:border-indigo-500 text-sm"
+            />
+            <select
+              id="history-filter-type"
+              class="bg-slate-800 border border-slate-700 rounded-lg p-2 outline-none focus:border-indigo-500 text-sm"
+            >
               <option value="">-- Alle Trainingstypen --</option>
               <option value="Training">Training</option>
               <option value="Wettkampf">Wettkampf</option>
               <option value="Anschießen">Anschießen</option>
             </select>
-            <button onclick="filterHistorySeries()" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg font-semibold text-sm transition-all">
+            <button
+              onclick="filterHistorySeries()"
+              class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg font-semibold text-sm transition-all"
+            >
               Filtern
             </button>
           </div>
@@ -546,13 +1028,16 @@ SOFTWARE.
     </div>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/styles.css">
-    
+    <link rel="stylesheet" href="css/styles.css" />
+
     <!-- External Libraries -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    
+
     <!-- App Scripts (in dieser Reihenfolge!) -->
     <script src="js/constants.js"></script>
     <script src="js/modules/storage.js"></script>
@@ -566,5 +1051,4 @@ SOFTWARE.
     <script src="js/services/imageGenerator.js"></script>
     <script src="js/services/app.js"></script>
   </body>
-
 </html>

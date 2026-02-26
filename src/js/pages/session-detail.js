@@ -610,10 +610,16 @@ function setupSettingsLogic(sessionId) {
 
   if (autoSaveCheck) {
     autoSaveCheck.onchange = (e) => {
-      currentSession.settings = { ...currentSession.settings, autoSave: e.target.checked };
       saveSession();
     };
   }
+
+  // Session Export Handlers
+  const pdfBtn = document.getElementById('exportPdfBtn');
+  const excelBtn = document.getElementById('exportExcelBtn');
+
+  if (pdfBtn) pdfBtn.onclick = () => exportSessionToPDF();
+  if (excelBtn) excelBtn.onclick = () => exportSessionToExcel();
 
   function renderSessionRecipients() {
     const container = document.getElementById('recipientSelectionContainer');
@@ -774,4 +780,151 @@ function openTargetPreview(seriesId, athleteId) {
     window.location.href = `shooting.html?series=${seriesId}&session=${currentSession.id}&athleteId=${athleteId}`;
   };
   modal.classList.remove('hidden');
+}
+
+/**
+ * EXPORT LOGIC
+ */
+
+function exportSessionToPDF() {
+  if (!currentSession) return;
+
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  const lang = typeof getLanguage === 'function' ? getLanguage() : 'de';
+
+  // Determine max series count for dynamic columns
+  let maxSeriesCount = 0;
+  sessionAthletes.forEach((athlete) => {
+    const count = (currentSession.series || []).filter((s) => s.athleteId == athlete.id).length;
+    if (count > maxSeriesCount) maxSeriesCount = count;
+  });
+
+  // Minimum 4 columns for aesthetics if less, but usually we just want what's there
+  const seriesCols = Array.from({ length: maxSeriesCount }, (_, i) => `SF ${i + 1}`);
+
+  // Table Data
+  const head = [
+    [t('name') || 'Name', t('age_group_short') || 'Klasse', t('hits') || 'Treffer', ...seriesCols],
+  ];
+
+  const body = sessionAthletes.map((athlete) => {
+    const atomSeries = (currentSession.series || [])
+      .filter((s) => s.athleteId == athlete.id)
+      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    const hitCount = atomSeries.reduce((sum, s) => sum + (s.stats?.hitCount || 0), 0);
+    const totalShots = atomSeries.reduce((sum, s) => sum + (s.stats?.totalShots || 0), 0);
+    const hitRate = totalShots > 0 ? `${Math.round((hitCount / totalShots) * 100)}%` : '-';
+
+    const seriesData = Array.from({ length: maxSeriesCount }, (_, i) => {
+      const s = atomSeries[i];
+      if (!s) return '-';
+      const hits = s.stats ? ` (${s.stats.hitCount}/${s.stats.totalShots})` : '';
+      return (s.rangeTime || '-') + hits;
+    });
+
+    return [
+      athlete.name,
+      athlete.ageGroup || '-',
+      `${hitCount}/${totalShots} (${hitRate})`,
+      ...seriesData,
+    ];
+  });
+
+  // Call autoTable - it should be on the doc instance or as a static method on jsPDF
+  const autoTableFn = doc.autoTable || jsPDF.autoTable;
+
+  if (typeof autoTableFn !== 'function') {
+    alert('Export Error: PDF AutoTable plugin not loaded correctly.');
+    return;
+  }
+
+  // Session Header
+  doc.setFontSize(20);
+  doc.setTextColor(0, 122, 255);
+  doc.text(currentSession.name, 14, 22);
+
+  doc.setFontSize(10);
+  doc.setTextColor(100, 100, 100);
+  const dateStr = new Date(currentSession.date).toLocaleDateString(
+    lang === 'de' ? 'de-DE' : 'en-US'
+  );
+  doc.text(`${dateStr} | ${currentSession.location} | ${currentSession.type}`, 14, 30);
+
+  autoTableFn.call(doc, {
+    head: head,
+    body: body,
+    startY: 40,
+    theme: 'striped',
+    headStyles: { fillColor: [0, 122, 255], fontSize: 10, fontStyle: 'bold' },
+    bodyStyles: { fontSize: 9 },
+    alternateRowStyles: { fillColor: [245, 248, 255] },
+    margin: { top: 40 },
+  });
+
+  const fileName = `Session_${currentSession.name.replace(/[^a-z0-9]/gi, '_')}.pdf`;
+  doc.save(fileName);
+}
+
+function exportSessionToExcel() {
+  if (!currentSession) return;
+
+  // Determine max series count for dynamic columns
+  let maxSeriesCount = 0;
+  sessionAthletes.forEach((athlete) => {
+    const count = (currentSession.series || []).filter((s) => s.athleteId == athlete.id).length;
+    if (count > maxSeriesCount) maxSeriesCount = count;
+  });
+
+  const data = sessionAthletes.map((athlete) => {
+    const atomSeries = (currentSession.series || [])
+      .filter((s) => s.athleteId == athlete.id)
+      .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+    const hitCount = atomSeries.reduce((sum, s) => sum + (s.stats?.hitCount || 0), 0);
+    const totalShots = atomSeries.reduce((sum, s) => sum + (s.stats?.totalShots || 0), 0);
+    const hitRate = totalShots > 0 ? Math.round((hitCount / totalShots) * 100) : 0;
+
+    const row = {
+      [t('name') || 'Name']: athlete.name,
+      [t('age_group') || 'Altersklasse']: athlete.ageGroup || '-',
+      [t('hits') || 'Treffer']: hitCount,
+      [t('total') || 'Gesamt']: totalShots,
+      [t('hit_rate') || 'Quote (%)']: hitRate,
+    };
+
+    // Add dynamic SF columns (separate Zeit/Treffer)
+    for (let i = 0; i < maxSeriesCount; i++) {
+      const s = atomSeries[i];
+      row[`SF ${i + 1} Zeit`] = s?.rangeTime || '-';
+      row[`SF ${i + 1} Treffer`] = s?.stats ? `${s.stats.hitCount}/${s.stats.totalShots}` : '-';
+    }
+
+    return row;
+  });
+
+  const worksheet = XLSX.utils.json_to_sheet(data);
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Results');
+
+  // Set column widths dynamically
+  // 5 initial columns + (maxSeriesCount * 2) SF columns
+  const wscols = [
+    { wch: 25 }, // Name
+    { wch: 15 }, // Age Group
+    { wch: 10 }, // Hits
+    { wch: 10 }, // Total
+    { wch: 10 }, // Hit Rate
+  ];
+
+  for (let i = 0; i < maxSeriesCount; i++) {
+    wscols.push({ wch: 12 }); // Zeit
+    wscols.push({ wch: 10 }); // Treffer
+  }
+
+  worksheet['!cols'] = wscols;
+
+  const fileName = `Session_${currentSession.name.replace(/[^a-z0-9]/gi, '_')}.xlsx`;
+  XLSX.writeFile(workbook, fileName);
 }

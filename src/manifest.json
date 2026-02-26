@@ -9,10 +9,7 @@
   "orientation": "portrait",
   "scope": "/",
   "start_url": "index.html",
-  "categories": [
-    "sports",
-    "utilities"
-  ],
+  "categories": ["sports", "utilities"],
   "icons": [
     {
       "src": "assets/images/app-icon.png",

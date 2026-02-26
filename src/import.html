@@ -1,0 +1,199 @@
+<!--
+MIT License
+
+Copyright (c) 2026 jmfrohs
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+-->
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+      name="viewport"
+    />
+    <title data-i18n="import_data">Import Data - Biathlon Assistant</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,container-queries"></script>
+    <script src="js/core/theme-manager.js"></script>
+    <script src="js/core/lang.js"></script>
+    <script src="js/utils/utils.js"></script>
+
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <!-- SheetJS (XLSX) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/global.css" />
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            colors: {
+              primary: '#007AFF',
+              'deep-charcoal': 'var(--color-bg)',
+              'card-dark': 'var(--color-card)',
+              'neon-green': '#32D74B',
+              'neon-cyan': '#64D2FF',
+              'off-white': 'var(--color-text)',
+              'light-blue-info': '#8E8E93',
+              'border-subtle': 'var(--color-border)',
+            },
+            fontFamily: {
+              display: ['Inter', 'sans-serif'],
+            },
+            borderRadius: {
+              DEFAULT: '14px',
+              xl: '16px',
+              '2xl': '20px',
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+
+  <body class="text-off-white min-h-screen flex justify-center items-center bg-deep-charcoal">
+    <div
+      id="app-container"
+      class="w-full max-w-[430px] h-[932px] bg-deep-charcoal relative overflow-hidden flex flex-col shadow-2xl md:rounded-[55px] md:border-[8px] md:border-zinc-800"
+    >
+      <header class="px-6 pt-12 pb-6 border-b border-subtle">
+        <div class="flex items-center gap-4">
+          <button
+            onclick="window.history.back()"
+            class="w-10 h-10 flex items-center justify-center rounded-full bg-card-dark border border-subtle text-off-white/70 active:scale-95 transition-transform"
+          >
+            <span class="material-symbols-outlined">arrow_back</span>
+          </button>
+          <h1
+            class="text-2xl font-bold tracking-tight text-off-white"
+            data-i18n="import_performance"
+          >
+            Import Performance
+          </h1>
+        </div>
+      </header>
+
+      <main class="flex-1 overflow-y-auto px-6 py-8 space-y-8 no-scrollbar">
+        <!-- Instructions -->
+        <div class="space-y-2">
+          <p class="text-sm text-light-blue-info font-medium" data-i18n="import_instructions_main">
+            Drag and drop a PDF or Excel file containing shooting results.
+          </p>
+          <p class="text-xs text-light-blue-info/60 italic" data-i18n="import_instructions_sub">
+            The app will try to match athletes and extract hit patterns.
+          </p>
+        </div>
+
+        <!-- Drop Zone -->
+        <div
+          id="drop-zone"
+          class="relative group cursor-pointer border-2 border-dashed border-subtle hover:border-primary/50 hover:bg-primary/5 rounded-3xl p-12 transition-all flex flex-col items-center justify-center text-center space-y-4"
+        >
+          <input
+            type="file"
+            id="file-input"
+            class="absolute inset-0 opacity-0 cursor-pointer"
+            accept=".pdf,.xlsx,.xls,.csv"
+          />
+          <div
+            class="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center text-primary group-hover:scale-110 transition-transform"
+          >
+            <span class="material-symbols-outlined text-4xl">upload_file</span>
+          </div>
+          <div>
+            <p class="text-off-white font-bold" data-i18n="drop_file_here">Drop file here</p>
+            <p class="text-xs text-light-blue-info" data-i18n="or_click_to_browse">
+              or click to browse
+            </p>
+          </div>
+          <div id="file-info" class="hidden text-sm font-semibold text-primary">
+            <span id="filename">file.pdf</span>
+          </div>
+        </div>
+
+        <!-- Results Section -->
+        <div id="import-results" class="hidden space-y-4">
+          <div class="flex justify-between items-center px-1">
+            <h2
+              class="text-sm font-black uppercase tracking-widest text-light-blue-info/70"
+              data-i18n="extracted_data"
+            >
+              Extracted Data
+            </h2>
+            <span id="match-count" class="text-xs font-bold text-neon-green">0 Matches Found</span>
+          </div>
+
+          <div id="entries-list" class="space-y-3">
+            <!-- Extracted entries will appear here -->
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="import-empty" class="py-12 text-center">
+          <div
+            class="w-16 h-16 bg-off-white/5 rounded-full flex items-center justify-center mx-auto mb-4"
+          >
+            <span class="material-symbols-outlined text-3xl text-off-white/20">find_in_page</span>
+          </div>
+          <p class="text-light-blue-info/50 text-sm italic" data-i18n="no_file_selected">
+            No file processed yet
+          </p>
+        </div>
+      </main>
+
+      <!-- Footer Action -->
+      <footer id="import-footer" class="hidden p-6 border-t border-subtle bg-card-dark/50 ios-blur">
+        <button
+          id="btn-confirm-import"
+          class="w-full py-4 bg-primary text-white font-bold rounded-2xl shadow-lg shadow-primary/25 active:scale-95 transition-transform flex items-center justify-center gap-2"
+        >
+          <span class="material-symbols-outlined">check_circle</span>
+          <span data-i18n="confirm_import">Confirm Import</span>
+        </button>
+      </footer>
+
+      <!-- Toast / Status -->
+      <div
+        id="status-toast"
+        class="fixed bottom-32 left-1/2 -translate-x-1/2 px-6 py-3 bg-zinc-900/90 border border-white/10 text-off-white text-sm font-semibold rounded-full shadow-2xl transition-all opacity-0 pointer-events-none z-50"
+      >
+        <span id="status-text">Processing...</span>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof translateApp === 'function') translateApp();
+      });
+    </script>
+    <script src="js/pages/import.js"></script>
+  </body>
+</html>

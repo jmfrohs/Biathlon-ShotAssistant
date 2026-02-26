@@ -11,16 +11,19 @@ npm install
 ## Test-Befehle
 
 ### Alle Tests ausführen
+
 ```bash
 npm test
 ```
 
 ### Tests im Watch-Modus (auto-reload bei Änderungen)
+
 ```bash
 npm run test:watch
 ```
 
 ### Test Coverage Report
+
 ```bash
 npm run test:coverage
 ```
@@ -28,12 +31,15 @@ npm run test:coverage
 ## Test-Struktur
 
 ### Setup-Datei
+
 - `tests/setup.js` - Konfiguration von Jest, Mocking von Browser-APIs
 
 ### Test-Dateien
 
 #### 1. **storage.test.js**
+
 Tests für die Persistierung von Daten im localStorage:
+
 - Session-Speicherung
 - Athleten-Speicherung
 - Email-Speicherung
@@ -41,7 +47,9 @@ Tests für die Persistierung von Daten im localStorage:
 - Gerätekonfiguration
 
 #### 2. **sessions.test.js**
+
 Tests für Session-Management:
+
 - Session-Anzeige und Rendering
 - Session-Erstellung mit Athleten
 - Session-Löschung
@@ -49,7 +57,9 @@ Tests für Session-Management:
 - Session-Typen (Training, Wettkampf, Anschießen)
 
 #### 3. **athletes.test.js**
+
 Tests für Athleten-Verwaltung:
+
 - Globale Athleten-Liste
 - Athleten-Hinzufügen/-Löschen
 - Duplikat-Prävention
@@ -57,7 +67,9 @@ Tests für Athleten-Verwaltung:
 - Alle Athleten auswählen/abwählen
 
 #### 4. **shooting.test.js**
+
 Tests für Schießfunktionalität:
+
 - Schuss-Aufzeichnung
 - Position-Management (Liegend/Stehend)
 - Target-Click-Handling
@@ -67,7 +79,9 @@ Tests für Schießfunktionalität:
 - Durchschnittliche Schussposition
 
 #### 5. **speech.test.js**
+
 Tests für Sprachsteuerung:
+
 - Speech Recognition Setup
 - Steuerung (Start/Stop/Abort)
 - Ergebnisverarbeitung
@@ -77,7 +91,9 @@ Tests für Sprachsteuerung:
 - Transkriptions-Anzeige
 
 #### 6. **email.test.js**
+
 Tests für Email-Funktionalität:
+
 - Email-Verwaltung (Hinzufügen/Löschen)
 - Email-Validierung
 - EmailJS-Konfiguration
@@ -87,7 +103,9 @@ Tests für Email-Funktionalität:
 - Email-Inhalts-Formatierung
 
 #### 7. **ui.test.js**
+
 Tests für Benutzeroberfläche:
+
 - Trainer-Name-Anzeige
 - Modal-Management
 - Ansicht-Navigation
@@ -96,7 +114,9 @@ Tests für Benutzeroberfläche:
 - Statistik-Berechnung (Hit-Rate, Durchschnittliche Ringe)
 
 #### 8. **utils.test.js**
+
 Tests für Utility-Funktionen:
+
 - Deutsche Zahlenwort-Konvertierung
 - Zufallszahlen-Generierung
 - Ring-Berechnung aus Entfernung
@@ -107,7 +127,9 @@ Tests für Utility-Funktionen:
 - Swipe-Erkennung
 
 #### 9. **integration.test.js**
+
 Integrierte Tests für komplexe Workflows:
+
 - Kompletter Session-Workflow
 - Multi-Athlet-Session-Management
 - Datenpersistenz-Workflow
@@ -137,6 +159,7 @@ Die Test-Suite deckt folgende Bereiche ab:
 5. Nutze `expect()` für Assertions
 
 Beispiel:
+
 ```javascript
 describe('My Feature', () => {
   test('should do something', () => {
@@ -148,16 +171,19 @@ describe('My Feature', () => {
 ## Debugging
 
 ### Debug-Output in Tests
+
 ```javascript
 console.log('Debug info:', variable);
 ```
 
 ### Jest Debug-Modus
+
 ```bash
 node --inspect-brk node_modules/.bin/jest --runInBand
 ```
 
 ### Einen einzelnen Test ausführen
+
 ```bash
 npx jest tests/storage.test.js -t "should save sessions"
 ```
